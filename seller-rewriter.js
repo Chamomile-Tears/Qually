@@ -197,6 +197,7 @@ try {
 	$('#toggleBottom').click(function() {
 		$('#sellrewButtons1').slideToggle({duration:250, easing:'swing'});
 		if (($('.leftSidedPanel').length == 2) || ($('.leftSidedPanel').last().prev().attr('id') == "sellrewPanel")) {
+			alert('1');
 			if (toggled) {
 				var animationCounter = 0;
 				var timing = 1;
