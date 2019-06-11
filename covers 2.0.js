@@ -701,7 +701,7 @@ function sleep() {
 
 function main(num) {
 	checkLicorneCovers();
-	if (Number($('#reserve').text().replace(/[ ]/gim, '')) < 1000) {
+	if (Number($('#reserve').text().replace(/[ ]/gim, '')) < 1200) {
 		checkMoney();
 	}
 	else if (($('div[widget^="7"] #cheval-inscription').length !== 0) && (set.coversEcDuration !== '0') && (centreNotFound < 1)) {
