@@ -729,5 +729,11 @@ try {
 			refreshStatus();
 		}
 	});
+
+	$('.damier-cell').live('click', function(e) {
+		if (($('.header-logo').html().indexOf('vip') == -1) && ($('.header-logo').html().indexOf('pegase') == -1)) {
+			if (e.target !== $(this).find('.checkbox')[0]) {($(this).find('.checkbox'))[0].click();
+		}
+	}});
 }
 catch (e) {alert('Ошибка! Обратитесь к разработчику со скриншотом этого окна. Текст ошибки: Interface Error\n' + e);}
