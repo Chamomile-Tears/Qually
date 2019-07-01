@@ -228,6 +228,7 @@ $(document).ready(function() {
 
 function refreshStatus() {
 		//Отображение режима
+		$('#sellrewPanelSettings').css('height', '455px');
 		if (localStorage.getItem('sellrewBuy') == '1') {
 			$('#sellrewPanelSettings').css('height', '455px');
 			switch(true) {
@@ -269,14 +270,21 @@ function refreshStatus() {
 		}
 	}
 function refreshAm() { //Отображение кол-ва лошадей в списке на продажу/переименовку
-	if (((mode == 1) && ((subMode == 4) || (subMode == 2))) || (mode == 2) && ((subMode == 1) || (subMode == 3))) {
+	if (mode == 2) {
+		$('#sellrewPanelSettings').css('height', '490px');
 		$('#sellrewModeStatus p:eq(2)').css('display', '');
+		$('#clearListToSaleRewrite').css('display', '');
 		if (localStorage.getItem('listToSaleRewrite') !== null) {
 			$('#sellrewModeStatus p:eq(2)').text('Лошадей в списке: ' + localStorage.getItem('listToSaleRewrite').split(',').length);
 		}
 		else {
 			$('#sellrewModeStatus p:eq(2)').text('Лошадей в списке: 0');
 		}
+	}
+	else {
+		$('#sellrewModeStatus p:eq(2)').css('display', 'none');
+		$('#clearListToSaleRewrite').css('display', 'none');
+		refreshStatus();
 	}
 }
 
@@ -310,7 +318,7 @@ try {
 	$('#sellrewPanelSettings').append('<div id="sellrewModeStatus" style="width:395px; margin:10px 5px 0 10px; padding:5px 5px 8px 8px; border:1px solid white; border-radius: 5px; font-size:14px; color:#fff; text-align: center"></div>');
 	$('#sellrewModeStatus').append('<p>Текущий режим: </p>');
 	$('#sellrewModeStatus').append('<p>Место запуска: </p>');
-	$('#sellrewModeStatus').append('<p style="display:none">Лошадей в списке: </p>');
+	$('#sellrewModeStatus').append('<p style="display:none">Лошадей в списке: </p><a style="font-size:14px; font-weight:bold; color:#fff" id="clearListToSaleRewrite">Очистить список</a>');
 	//Колонка 1: Выкуп и переименовка
 	$('#sellrewPanelSettings').append('<div id="columnOneSr" style="float:left;"></div>');
 	//Выкуп
@@ -389,7 +397,6 @@ try {
 	/*------------------------------------------------------------------------------------*/
 	//Смещение относительно других qually-скриптов, значок валюты в скрипте
 	$(document).ready(function() {
-		//$('#pictureValute').attr('src', '');
 		if (($('html[dir*="r"]').has($('.leftSidedPanel'))) && ($('.leftSidedPanel').eq($('.leftSidedPanel').length-4).attr('id') !== 'sellrewPanel')) {
 			var top1 = $('.leftSidedPanel').last().css('top');
 			if (top1 !== undefined) {top1 = Number(top1.replace('px', ''));}
@@ -398,6 +405,10 @@ try {
 			$('#sellrewPanel').css('top', a + 'px');
 			$('#sellrewPanelSettings').css('top', a + 'px');
 		}
+		if (set.sellrewBuyPasses == 1) {
+			$('#pictureValute').attr('src', '/media/equideo/image/fonctionnels/20/pass.png');
+		}
+		if (localStorage.getItem('listToSaleRewrite') !== null) {listToSaleRewrite = localStorage.getItem('listToSaleRewrite').split(',');}
 		refreshStatus();
 		refreshAm();
 	});
@@ -589,24 +600,44 @@ try {
 		$('#sellrewPanelSettings').hide(0);
 	});
 
-	//Нажатие на кнопку "Вкл/выкл"
-	$('#sellrewPower').click(function() {
-		if ((location.href.indexOf('elevage/chevaux/?elevage=') !== -1) || (location.href.indexOf('elevage/bureau/') !== -1)) {
-			$('#sellrewPanelSettings').hide(0);
-			if (sellrewStartup == 0) {
-				$(this).css({"-webkit-filter" : "hue-rotate(0deg)"});
-				sellrewStartup = 1;
-				localStorage.setItem('sellrewWorkPlace', location.href);
-			}
-			else {
-				$(this).css({"-webkit-filter" : "hue-rotate(280deg)"});
-				sellrewStartup = 0;
-			}
-			localStorage.setItem('sellrewStartup', sellrewStartup);
-			location.reload();
+	function startUp() { //функция запуска работы скрита по нажатию на кнопку
+		$('#sellrewPanelSettings').hide(0);
+		if (sellrewStartup == 0) {
+			$(this).css({"-webkit-filter" : "hue-rotate(0deg)"});
+			sellrewStartup = 1;
+			localStorage.setItem('sellrewWorkPlace', location.href);
 		}
 		else {
-			alert('Запуск скрипта Seller-Rewriter должен производиться со страницы любого из ваших заводов или из офиса.');
+			$(this).css({"-webkit-filter" : "hue-rotate(280deg)"});
+			sellrewStartup = 0;
+			localStorage.removeItem('sellrewWorkPlace');
+			localStorage.removeItem('affixesList');
+			localStorage.removeItem('farmsList');
+			localStorage.removeItem('listToSaleRewrite');
+		}
+		localStorage.setItem('sellrewStartup', sellrewStartup);
+		location.reload();
+	}
+	//Нажатие на кнопку "Вкл/выкл"
+	$('#sellrewPower').click(function() {
+		if (mode == 1) {
+			if ((location.href.indexOf('elevage/bureau/') !== -1) || (location.href.indexOf('/marche/vente/?type=prive&typeSave=1') !== -1)) {
+				startUp();
+			}
+			else {
+				alert('Запуск скрипта по текущим настройкам производится со страницы офиса (вкладка "Коневодство" -> "Офис") или зарезервированных продаж (вкладка "Торговля" -> "Продажа лошадей" -> "Зарезервированные продажи").');
+			}
+		}
+		else if (mode == 2) {
+			if (location.href.indexOf('/elevage/chevaux/?elevage') !== -1) {
+				startUp();
+			}
+			else {
+				alert('Запуск скрипта по текущим настройкам производится со страницы заводов (вкладка "Коневодство" -> "Лошади").');
+			}
+		}
+		else {
+			alert('Вы не настроили режим работы!');
 		}
 	});
 
@@ -630,15 +661,25 @@ try {
 		if ($('.chooseHorse input:checked').length > 0) {
 			var arr1 = $('.chooseHorse input:checked').toArray();
 			for (i = 0; i < arr1.length; i++) {
-				arr1[i] = $(arr1[i]).attr('value');
+				if ($(arr1[i]).attr('value') !== 'on') {
+					arr1[i] = $(arr1[i]).attr('value');
+				}
+				else {
+					arr1[i] = $(arr1[i]).attr('id');
+				}
 			}
 			listToSaleRewrite = [...new Set(listToSaleRewrite.concat(arr1))];
 			localStorage.setItem('listToSaleRewrite', listToSaleRewrite);
-			refreshAm()
+			refreshAm();
 		}
 		else {
 			alert('Вы не выбрали ни одной лошади!');
 		}
+	});
+
+	$('#clearListToSaleRewrite').click(function() {
+		localStorage.removeItem('listToSaleRewrite');
+		refreshAm();
 	});
 
 	$('#sellrewResetSettings').click(function() {
@@ -656,13 +697,17 @@ try {
 	$('#sellrewResetSettings').click(function() {
 		for (i = 0; i < arr.length; i++) {
 			localStorage.removeItem(arr[i]);
+			localStorage.removeItem('race-ane');
+			localStorage.removeItem('sellrewWorkPlace');
+			localStorage.removeItem('affixesList');
+			localStorage.removeItem('farmsList');
 			location.reload();
 		}
 	});
-	$('#sellrewResetSettings').on('mouseover', function() {
+	$('#sellrewResetSettings, #clearListToSaleRewrite').on('mouseover', function() {
 		$(this).css('color', 'red').change();
 	});
-	$('#sellrewResetSettings').on('mouseout', function() {
+	$('#sellrewResetSettings, #clearListToSaleRewrite').on('mouseout', function() {
 		$(this).css('color', '#fff').change();
 	});
 
@@ -727,6 +772,7 @@ try {
 				localStorage.setItem($(this).attr('id'), 2);
 			}
 			refreshStatus();
+			refreshAm();
 		}
 	});
 
