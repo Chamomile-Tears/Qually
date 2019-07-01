@@ -2,7 +2,7 @@
 // @name         Qually Sell-Rewrite
 // @version      2.0
 // @namespace    http://tampermonkey.net/
-// @description  Прогон с записью в КСК и случками
+// @description  Выкуп ЗП, продажа и переименовка
 // @author       https://vk.com/botqually
 // @match        www.howrse.com/*
 // @match        us.howrse.com/*
