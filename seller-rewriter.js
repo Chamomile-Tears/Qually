@@ -115,6 +115,7 @@ function getSales(m) {
 					}
 					//buyHorse();
 					console.log(horsesId);
+					getTeamAffixes();
 				}
 				else {
 					if ((set.sellrewRewrite == '2') && (set.sellrewSell == '2')) {
@@ -250,47 +251,95 @@ function getFarms(m) {
 			}
 			localStorage.setItem('farmsList', farmsList);
 		});
+		formRewriteData(horsesId[0]);
 	}
 }
 
+var coatRarity = 0;
+var rewriteData = '';
+
+function getCoatRarity(horse) {
+	var hor = horse.split('SELLREW')[5];
+	post = $.ajax({
+		type: "POST",
+		url: window.location.origin + '/communaute/doTabContent',
+		data: 'type=tab-chevaux'
+	})
+	.then(function(result) {
+		parse(result['statisticComplement']);
+		var a = $('#table-2 a', html);
+		var b = '';
+		for (i = 0; i < a.length; i++) {
+			if (hor.indexOf($(a).eq(i).text()) !== -1) {
+				b = $(a).eq(i).attr('href'); break;
+			}
+		}
+		get = $.ajax({
+			type: "GET",
+			url: window.location.origin + '/' + b,
+		})
+		.then(function(result) {
+			parse(result);
+			var percent = 100;
+			var coats = $('#table-0 strong:not(".nowrap")', html);
+			for (i = 0; i < coats.length; i++) {
+				if (hor.indexOf($(coats).eq(i).text()) !== -1) {
+					percent = Number($('#table-0 strong.nowrap', html).eq(i).text().replace('%', '')); break;
+				}
+			}
+			if (percent < 6) {coatRarity = ' ' + percent + '%';}
+			else {coatRarity = '';}
+			formRewriteData(horse);
+		});
+	});
+}
+
 function formRewriteData(horse) {
-	var rewriteData = '';
-	var a1; var a2; var a3; var a4; var isHorseFem;
-	a1 = horse.split('SELLREW')[0];
-	if (horse.split('SELLREW')[2].indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
-	if ((isHorseFem) && (set.sellrewFemale == '')) {a2 = horse.split('SELLREW')[1];}
-	else if ((isHorseFem == false) && (set.sellrewMale == '')) {a2 = horse.split('SELLREW')[1];}
-	else if ((isHorseFem) && (set.sellrewFemale !== '')) {a2 = set.sellrewFemale;}
-	else if ((isHorseFem == false) && (set.sellrewMale !== '')) {a2 = set.sellrewMale;}
-	switch(set.sellrewAddToName) {
-		case 'none': break;
-		case '0': a2 = a2 + ' ' + horse.split('SELLREW')[3]; break;
-		case '1': a2 = a2 + ' ' + horse.split('SELLREW')[3].slice(-5); break;
-		case '2': a2 = a2 + ' ' + horse.split('SELLREW')[4]; break;
-		case '3': console.log('масть'); break;
+	if ((set.sellrewAddToName == '3') && (coatRarity === 0)) {
+		getCoatRarity(horse);
 	}
-	if (set.sellrewAffixe !== '') {
-		if (set.sellrewAffixe == 'Без аффикса') {
-			a3 = '';
+	else {
+		var a1; var a2; var a3; var a4; var isHorseFem;
+		a1 = horse.split('SELLREW')[0];
+		if (horse.split('SELLREW')[2].indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
+		if ((isHorseFem) && (set.sellrewFemale == '')) {a2 = horse.split('SELLREW')[1];}
+		else if ((isHorseFem == false) && (set.sellrewMale == '')) {a2 = horse.split('SELLREW')[1];}
+		else if ((isHorseFem) && (set.sellrewFemale !== '')) {a2 = set.sellrewFemale;}
+		else if ((isHorseFem == false) && (set.sellrewMale !== '')) {a2 = set.sellrewMale;}
+		switch(set.sellrewAddToName) {
+			case 'none': break;
+			case '0': a2 = a2 + ' ' + horse.split('SELLREW')[3]; break;
+			case '1': a2 = a2 + ' ' + horse.split('SELLREW')[3].slice(-5); break;
+			case '2': a2 = a2 + ' ' + horse.split('SELLREW')[4]; break;
+			case '3': a2 = a2 + coatRarity; break;
 		}
-		else {
-			for (i = 0; i < affixesList.length; i++) {
-				if (set.sellrewAffixe.replace(/ /gim, '').toLowerCase() == affixesList[i].split('SELLREW')[0]) {a3 = affixesList[i].split('SELLREW')[1]; break;}
+		if (set.sellrewAffixe !== '') {
+			if (set.sellrewAffixe == 'Без аффикса') {
+				a3 = '';
+			}
+			else {
+				for (i = 0; i < affixesList.length; i++) {
+					if (set.sellrewAffixe.replace(/ /gim, '').toLowerCase() == affixesList[i].split('SELLREW')[0]) {a3 = affixesList[i].split('SELLREW')[1]; break;}
+				}
 			}
 		}
-	}
-	if (set.sellrewFarm !== '') {
-		if (set.sellrewFarm == 'Без завода') {
-			a4 = '';
-		}
-		else {
-			for (i = 0; i < farmsList.length; i++) {
-				if (set.sellrewFarm.replace(/ /gim, '').toLowerCase() == farmsList[i].split('SELLREW')[0]) {a4 = farmsList[i].split('SELLREW')[1]; break;}
+		else {a3 = 'none';}
+		if (set.sellrewFarm !== '') {
+			if (set.sellrewFarm == 'Без завода') {
+				a4 = '';
+			}
+			else {
+				for (i = 0; i < farmsList.length; i++) {
+					if (set.sellrewFarm.replace(/ /gim, '').toLowerCase() == farmsList[i].split('SELLREW')[0]) {a4 = farmsList[i].split('SELLREW')[1]; break;}
+				}
 			}
 		}
+		else {a4 = '';}
+
+		if (a3 == 'none') {rewriteData = 'id=' + a1 + '&name=' + a2 + '&elevage=' + a4;}
+		else {rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;}
+		console.log(rewriteData);
 	}
-	rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;
-	return rewriteData;
 }
 
 function rewriteHorse(m) {
