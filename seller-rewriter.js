@@ -44,6 +44,8 @@ var get;
 var horsesId = [];
 var salesList = [];
 var listToSaleRewrite = [];
+var affixesList = [];
+var farmsList = [];
 //Загрузка настроек
 var inputs = ['sellrewBuyPrice', 'sellrewFarm', 'sellrewAffixe', 'sellrewMale', 'sellrewFemale', 'sellrewAuctionEquus', 'sellrewDirectEquus', 'sellrewDirectPasses', 'sellrewReserveEquus', 'sellrewReservePasses', 'sellrewBreeder', 'sellrewSelectAmount', 'sellrewHorseNumber'];
 var selects = ['sellrewAddToName'];
@@ -62,7 +64,29 @@ function parse(result) {
 	html.innerHTML = result;
 }
 
-function getSales() {
+function fillSalesList(i) {
+	var horseGp = 0;
+	var cTable = document.createElement('html')
+	cTable.innerHTML = $('#table-0 tr.highlight:eq('+ i +') span.competence', html).attr('data-tooltip');
+	for (j = 0; j < $('strong', cTable).length; j++) {horseGp += (Number($('strong', cTable).eq(j).text().replace(/ /gim, '').replace(/,/gim, '.')));}
+	horseGp = horseGp.toFixed(2);
+
+	var horseSkills = 0;
+	var cTable = document.createElement('html')
+	cTable.innerHTML = $('#table-0 tr.highlight:eq('+ i +') div.competence', html).attr('data-tooltip');
+	for (j = 0; j < $('strong', cTable).length; j++) {horseSkills += (Number($('strong', cTable).eq(j).text().replace(/ /gim, '').replace(/,/gim, '.')));}
+	horseSkills = horseSkills.toFixed(2);
+
+	horsesId[horsesId.length] = $('#table-0 tr.highlight:eq('+ i +') a.horsename', html).attr('href').split('=')[1] + 'SELLREW' + $('#table-0 tr.highlight:eq('+ i +') a.horsename', html).text() + 'SELLREW' + $('#table-0 tr.highlight:eq('+ i +') img:eq(1)', html).attr('src').split('/')[6] + 'SELLREW' + horseGp + 'SELLREW' + horseSkills + 'SELLREW' + $('#table-0 tr.highlight:eq('+ i +') img.cheval-icone', html).attr('alt');
+	var firstPrix = Number($('#table-0 tr.highlight:eq('+ i +') td div[id*="prix"]', html).text().replace(/[ ,NEGOTIABLE]/gim, ''));
+	var scr = $('#table-0 tr.highlight:eq('+ i +') td div[id*="acheter"] script', html).html();
+	var i1 = scr.indexOf('params') + 10;
+	var i2 = scr.indexOf(' return false') - 7;
+	scr = scr.substring(i1, i2).toLowerCase();
+	salesList[salesList.length] = scr;
+}
+
+function getSales(m) {
 	salesList = [];
 	if (localStorage.getItem('race-ane') == null) {
 		get = $.ajax({
@@ -87,15 +111,10 @@ function getSales() {
 				parse(result);
 				if ($('img[src*="chevaux"]', html).length > 1) {
 					for (i = 0; i < $('#table-0 tr.highlight', html).length; i++) {
-						horsesId[horsesId.length] = $('#table-0 tr.highlight:eq('+ i +') a.horsename', html).attr('href').split('=')[1] + ',' + $('#table-0 tr.highlight:eq('+ 0 +') img:eq(1)', html).attr('src').split('/')[6];
-						var firstPrix = Number($('#table-0 tr.highlight:eq('+ i +') td div[id*="prix"]', html).text().replace(/[ ,NEGOTIABLE]/gim, ''));
-						var scr = $('#table-0 tr.highlight:eq('+ i +') td div[id*="acheter"] script', html).html();
-						var i1 = scr.indexOf('params') + 10;
-						var i2 = scr.indexOf(' return false') - 7;
-						scr = scr.substring(i1, i2).toLowerCase();
-						salesList[salesList.length] = scr;
+						fillSalesList(i);
 					}
-					buyHorse();
+					//buyHorse();
+					console.log(horsesId);
 				}
 				else {
 					if ((set.sellrewRewrite == '2') && (set.sellrewSell == '2')) {
@@ -121,15 +140,9 @@ function getSales() {
 				parse(result);
 				if ($('img[src*="chevaux"]', html).length > 1) {
 					for (i = 0; i < $('#table-0 tr.highlight', html).length; i++) {
-						horsesId[horsesId.length] = $('#table-0 tr.highlight:eq('+ i +') a.horsename', html).attr('href').split('=')[1];
-						var firstPrix = Number($('#table-0 tr.highlight:eq('+ i +') td div[id*="prix"]', html).text().replace(/[ ,NEGOTIABLE]/gim, ''));
-						var scr = $('#table-0 tr.highlight:eq('+ i +') td div[id*="acheter"] script', html).html();
-						var i1 = scr.indexOf('params') + 10;
-						var i2 = scr.indexOf(' return false') - 7;
-						scr = scr.substring(i1, i2).toLowerCase();
-						salesList[salesList.length] = scr;
+						fillSalesList(i);
 					}
-					buyHorse();
+					//buyHorse();
 				}
 				else {
 					if ((set.sellrewRewrite == '2') && (set.sellrewSell == '2')) {
@@ -166,7 +179,43 @@ function buyHorse() {
 	});
 }
 
-function getAffixes() {
+var teamAffixesCount = 0;
+var teamAffixes = [];
+function getTeamAffixes(m) {
+	if ($('a.level-2.grid-table.width-100.align-middle[href^="/equipe/"]').length !== 0) {
+		get = $.ajax({
+			type: "GET",
+			url: window.location.origin + '/equipe/'
+		}).
+		then(function(result) {
+			parse(result);
+			var teams = $('a[href*="/equipe/membre/?id="]', html);
+			if ($(teams).eq(teamAffixesCount).length == 0) {
+				getAffixes(m);
+			}
+			else {
+				get = $.ajax({
+					type: "GET",
+					url: $(teams).eq(teamAffixesCount).attr('href'),
+				}).
+				then(function(result) {
+					parse(result);
+					teamAffixes[teamAffixes.length] = $('a.affixe', html).eq(0).text().replace(/ /gim, '').toLowerCase() + 'SELLREW' + $('a.affixe', html).eq(0).attr('href').split('id=')[1];
+					teamAffixesCount++;
+					if (teamAffixes.length < teams.length) {getTeamAffixes();}
+					else {
+						getAffixes(m);
+					}
+				});
+			}
+		});
+	}
+	else {
+		getAffixes(m);
+	}
+}
+
+function getAffixes(m) {
 	affixesList = [];
 	if (localStorage.getItem('affixesList') == null) {
 		get = $.ajax({
@@ -179,12 +228,14 @@ function getAffixes() {
 			for (i = 0; i < affs.length; i++) {
 				affixesList[affixesList.length] = $('tr[height^="40"] .affixe', html).eq(i).text().replace(/ /gim, '').toLowerCase() + 'SELLREW' + $('tr[height^="40"] .affixe', html).eq(i).attr('href').split('id=')[1];
 			}
+			if (teamAffixes.length > 0) {affixesList = affixesList.concat(teamAffixes);}
 			localStorage.setItem('affixesList', affixesList);
+			getFarms(m);
 		});
 	}
 }
 
-function getFarms() {
+function getFarms(m) {
 	farmsList = [];
 	if (localStorage.getItem('farmsList') == null) {
 		get = $.ajax({
@@ -202,19 +253,75 @@ function getFarms() {
 	}
 }
 
+function formRewriteData(horse) {
+	var rewriteData = '';
+	var a1; var a2; var a3; var a4; var isHorseFem;
+	a1 = horse.split('SELLREW')[0];
+	if (horse.split('SELLREW')[2].indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
+	if ((isHorseFem) && (set.sellrewFemale == '')) {a2 = horse.split('SELLREW')[1];}
+	else if ((isHorseFem == false) && (set.sellrewMale == '')) {a2 = horse.split('SELLREW')[1];}
+	else if ((isHorseFem) && (set.sellrewFemale !== '')) {a2 = set.sellrewFemale;}
+	else if ((isHorseFem == false) && (set.sellrewMale !== '')) {a2 = set.sellrewMale;}
+	switch(set.sellrewAddToName) {
+		case 'none': break;
+		case '0': a2 = a2 + ' ' + horse.split('SELLREW')[3]; break;
+		case '1': a2 = a2 + ' ' + horse.split('SELLREW')[3].slice(-5); break;
+		case '2': a2 = a2 + ' ' + horse.split('SELLREW')[4]; break;
+		case '3': console.log('масть'); break;
+	}
+	if (set.sellrewAffixe !== '') {
+		if (set.sellrewAffixe == 'Без аффикса') {
+			a3 = '';
+		}
+		else {
+			for (i = 0; i < affixesList.length; i++) {
+				if (set.sellrewAffixe.replace(/ /gim, '').toLowerCase() == affixesList[i].split('SELLREW')[0]) {a3 = affixesList[i].split('SELLREW')[1]; break;}
+			}
+		}
+	}
+	if (set.sellrewFarm !== '') {
+		if (set.sellrewFarm == 'Без завода') {
+			a4 = '';
+		}
+		else {
+			for (i = 0; i < farmsList.length; i++) {
+				if (set.sellrewFarm.replace(/ /gim, '').toLowerCase() == farmsList[i].split('SELLREW')[0]) {a4 = farmsList[i].split('SELLREW')[1]; break;}
+			}
+		}
+	}
+	rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;
+	return rewriteData;
+}
+
+function rewriteHorse(m) {
+	if (m == '1.2') {
+
+	}
+}
+
 var mode;
 var subMode;
 function main() {
 	refreshStatus();
-	if (mode == 0) {
-		alert('Режим: нет ');
+	/*if (mode == 0) {
+		alert('Вы не настроили режим работы скрипта, проверьте настройки!');
 	}
 	else if (mode == 1) {
-		alert('Режим: 1.' + subMode);
+		switch(subMode) {
+			case 1: getSales('1.1'); break;
+			case 2: getAffixes('1.2'); break;
+			case 3: getSales('1.3'); break;
+			case 4: getAffixes('1.4'); break;
+		}
 	}
 	else if (mode == 2) {
-		alert('Режим: 2.' + subMode);
-	}
+		switch(subMode) {
+			case 1: getSales('2.1'); break;
+			case 2: getAffixes('2.2'); break;
+			case 3: getSales('2.3'); break;
+		}
+	}*/
+	getSales();
 }
 
 $(document).ready(function() {
@@ -353,7 +460,7 @@ try {
 	$('#rewriteOptions2').append('<span class="tip" data-tippy-content="Называть жеребят случайными именами из списка"><input id="sellrewRandom" type="checkbox" style="position:relative; margin:0 5px 0 5px; top:1px"></span>');
 	$('#rewriteOptions').append('<div style="margin:5px 0 0 5px" id="rewriteOptions3"></div>');
 	$('#rewriteOptions3').append('<span style="color:#fff; cursor:default;">Добавить к имени:</span>');
-	$('#rewriteOptions3').append('<select id="sellrewAddToName" style="margin-top:3px; width:175px; background-color:#fff"><option value="0">ГП ххххх.хх</option><option value="1">ГП хх.хх</option><option value="2">Навыки</option><option value="4">Редкая масть (1-5%)</option></select>');
+	$('#rewriteOptions3').append('<select id="sellrewAddToName" style="margin-top:3px; width:175px; background-color:#fff"><option value="none">Не добавлять</option><option value="0">ГП ххххх.хх</option><option value="1">ГП хх.хх</option><option value="2">Навыки</option><option value="3">Редкая масть (1-5%)</option></select>');
 	//Продажа
 	$('#sellrewPanelSettings').append('<div id="sellOptions" style="float:left;width:185px; height:264px; margin:10px 5px 0 5px; padding:5px 5px 8px 8px; border:1px solid white; border-radius: 5px; font-size:14px; color:#fff"></div>');
 	$('#sellOptions').append('<div style="margin:5px 0 0 5px" id="sellOptions1"></div>');
@@ -621,7 +728,7 @@ try {
 	//Нажатие на кнопку "Вкл/выкл"
 	$('#sellrewPower').click(function() {
 		if (mode == 1) {
-			if ((location.href.indexOf('elevage/bureau/') !== -1) || (location.href.indexOf('/marche/vente/?type=prive&typeSave=1') !== -1)) {
+			if ((location.href.indexOf('elevage/bureau/') !== -1) || (location.href.indexOf('/marche/vente/?type=prive&typeSave=1') !== -1) || (sellrewStartup == 1)) {
 				startUp();
 			}
 			else {
@@ -629,7 +736,7 @@ try {
 			}
 		}
 		else if (mode == 2) {
-			if (location.href.indexOf('/elevage/chevaux/?elevage') !== -1) {
+			if ((location.href.indexOf('/elevage/chevaux/?elevage') !== -1) || (sellrewStartup == 1)) {
 				startUp();
 			}
 			else {
