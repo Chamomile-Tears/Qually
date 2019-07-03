@@ -476,6 +476,9 @@ function rewriteHorse(m) {
 sellData = '';
 function formSellData(horse) {
 	var a1;
+	var id;
+	if (horse.indexOf('SELLREW') !== -1) {id = horse.split('SELLREW')[0];}
+	else {id = horse;}
 	var id = horse.split('SELLREW')[0];
 	get = $.ajax({
 		type: "GET",
