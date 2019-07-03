@@ -271,105 +271,206 @@ var coatRarity = 0;
 var rewriteData = '';
 
 function getCoatRarity(horse) {
-	var hor = horse.split('SELLREW')[5];
-	post = $.ajax({
-		type: "POST",
-		url: window.location.origin + '/communaute/doTabContent',
-		data: 'type=tab-chevaux'
-	})
-	.then(function(result) {
-		parse(result['statisticComplement']);
-		var a = $('#table-2 a', html);
-		var b = '';
-		for (i = 0; i < a.length; i++) {
-			if (hor.indexOf($(a).eq(i).text()) !== -1) {
-				b = $(a).eq(i).attr('href'); break;
+	if (horse.indexOf('SELLREW') !== -1) {
+		var hor = horse.split('SELLREW')[5];
+		post = $.ajax({
+			type: "POST",
+			url: window.location.origin + '/communaute/doTabContent',
+			data: 'type=tab-chevaux'
+		})
+		.then(function(result) {
+			parse(result['statisticComplement']);
+			var a = $('#table-2 a', html);
+			var b = '';
+			for (i = 0; i < a.length; i++) {
+				if (hor.indexOf($(a).eq(i).text()) !== -1) {
+					b = $(a).eq(i).attr('href'); break;
+				}
 			}
-		}
+			get = $.ajax({
+				type: "GET",
+				url: window.location.origin + '/' + b,
+			})
+			.then(function(result) {
+				parse(result);
+				var percent = 100;
+				var coats = $('#table-0 strong:not(".nowrap")', html);
+				for (i = 0; i < coats.length; i++) {
+					if (hor.indexOf($(coats).eq(i).text()) !== -1) {
+						percent = Number($('#table-0 strong.nowrap', html).eq(i).text().replace('%', '')); break;
+					}
+				}
+				if (percent < 6) {coatRarity = ' ' + percent + '%';}
+				else {coatRarity = '';}
+				formRewriteData(horse);
+			});
+		});
+	}
+	else {
+		var url = horse.split(',')[0];
+		var ct = horse.split(',')[1];
 		get = $.ajax({
 			type: "GET",
-			url: window.location.origin + '/' + b,
+			url : window.location.origin + url,
+			data: {"qName": url.split('=')[1]}
 		})
 		.then(function(result) {
 			parse(result);
-			var percent = 100;
-			var coats = $('#table-0 strong:not(".nowrap")', html);
-			for (i = 0; i < coats.length; i++) {
-				if (hor.indexOf($(coats).eq(i).text()) !== -1) {
-					percent = Number($('#table-0 strong.nowrap', html).eq(i).text().replace('%', '')); break;
+			var percent;
+			var pNum;
+			var percents = $('#table-0 td', html);
+			for (var i = 0; i < percents.length; i++) {
+				if ($('#table-0 td:eq('+i+')', html).text() == ct) {
+					percent = $('#table-0 td:eq('+i+')', html).next().text();
+					pNum = Number(percent.replace('%', ''));
 				}
 			}
-			if (percent < 6) {coatRarity = ' ' + percent + '%';}
+			if (pNum < 6) {coatRarity = ' ' + pNum + '%';}
 			else {coatRarity = '';}
-			formRewriteData(horse);
+			formRewriteData(horse.split(',')[2]);
 		});
-	});
+	}	
 }
 
 function formRewriteData(horse) {
-	if ((set.sellrewAddToName == '3') && (coatRarity === 0)) {
-		getCoatRarity(horse);
+	var a1; var a2; var a3; var a4; var isHorseFem;
+	if (mode == 1) {
+		if ((set.sellrewAddToName == '3') && (coatRarity === 0)) {
+			getCoatRarity(horse);
+		}
+		else {
+			a1 = horse.split('SELLREW')[0];
+			if (horse.split('SELLREW')[2].indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
+			if ((isHorseFem) && (set.sellrewFemale == '')) {
+				if (set.sellrewRandom !== '1') {a2 = horse.split('SELLREW')[1];}
+				else {a2 = fNames[randomInteger(0, fNames.length)];}
+			}
+			else if ((isHorseFem == false) && (set.sellrewMale == '')) {
+				if (set.sellrewRandom !== '1') {a2 = horse.split('SELLREW')[1];}
+				else {a2 = mNames[randomInteger(0, mNames.length)];}
+			}
+			else if ((isHorseFem) && (set.sellrewFemale !== '')) {
+				if (set.sellrewRandom !== '1') {a2 = set.sellrewFemale;}
+				else {a2 = fNames[randomInteger(0, fNames.length)];}
+			}
+			else if ((isHorseFem == false) && (set.sellrewMale !== '')) {
+				if (set.sellrewRandom !== '1') {a2 = set.sellrewMale;}
+				else {a2 = mNames[randomInteger(0, mNames.length)];}
+			}
+			switch(set.sellrewAddToName) {
+				case 'none': break;
+				case '0': a2 = a2 + ' ' + horse.split('SELLREW')[3]; break;
+				case '1': a2 = a2 + ' ' + horse.split('SELLREW')[3].slice(-5); break;
+				case '2': a2 = a2 + ' ' + horse.split('SELLREW')[4]; break;
+				case '3': a2 = a2 + coatRarity; break;
+			}
+			if (set.sellrewAffixe !== '') {
+				if (set.sellrewAffixe == 'Без аффикса') {
+					a3 = '';
+				}
+				else {
+					for (i = 0; i < affixesList.length; i++) {
+						if (set.sellrewAffixe.replace(/ /gim, '').toLowerCase() == affixesList[i].split('SELLREW')[0]) {a3 = affixesList[i].split('SELLREW')[1]; break;}
+					}
+				}
+			}
+			else {a3 = 'none';}
+			if (set.sellrewFarm !== '') {
+				if (set.sellrewFarm == 'Без завода') {
+					a4 = '';
+				}
+				else {
+					for (i = 0; i < farmsList.length; i++) {
+						if (set.sellrewFarm.replace(/ /gim, '').toLowerCase() == farmsList[i].split('SELLREW')[0]) {a4 = farmsList[i].split('SELLREW')[1]; break;}
+					}
+				}
+			}
+			else {a4 = '';}
+
+			if (a3 == 'none') {rewriteData = 'id=' + a1 + '&name=' + a2 + '&elevage=' + a4;}
+			else {rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;}
+			coatRarity = 0;
+			console.log(rewriteData);
+		}
 	}
 	else {
-		var a1; var a2; var a3; var a4; var isHorseFem;
-		a1 = horse.split('SELLREW')[0];
-		if (horse.split('SELLREW')[2].indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
-		if ((isHorseFem) && (set.sellrewFemale == '')) {
-			if (set.sellrewRandom !== '1') {a2 = horse.split('SELLREW')[1];}
-			else {a2 = fNames[randomInteger(0, fNames.length)];}
-		}
-		else if ((isHorseFem == false) && (set.sellrewMale == '')) {
-			if (set.sellrewRandom !== '1') {a2 = horse.split('SELLREW')[1];}
-			else {a2 = mNames[randomInteger(0, mNames.length)];}
-		}
-		else if ((isHorseFem) && (set.sellrewFemale !== '')) {
-			if (set.sellrewRandom !== '1') {a2 = set.sellrewFemale;}
-			else {a2 = fNames[randomInteger(0, fNames.length)];}
-		}
-		else if ((isHorseFem == false) && (set.sellrewMale !== '')) {
-			if (set.sellrewRandom !== '1') {a2 = set.sellrewMale;}
-			else {a2 = mNames[randomInteger(0, mNames.length)];}
-		}
-		switch(set.sellrewAddToName) {
-			case 'none': break;
-			case '0': a2 = a2 + ' ' + horse.split('SELLREW')[3]; break;
-			case '1': a2 = a2 + ' ' + horse.split('SELLREW')[3].slice(-5); break;
-			case '2': a2 = a2 + ' ' + horse.split('SELLREW')[4]; break;
-			case '3': a2 = a2 + coatRarity; break;
-		}
-		if (set.sellrewAffixe !== '') {
-			if (set.sellrewAffixe == 'Без аффикса') {
-				a3 = '';
+		get = $.ajax({
+			type: "GET",
+			url: window.location.origin + '/elevage/chevaux/cheval?id=' + horse,
+		})
+		.then(function(result) {
+			parse(result);
+			a1 = horse;
+			var info = $('script:contains("chevalAge")', html).text().replace(/[^a-zA-Zа-яА-Я0-9; =.'</>]/gim, '').split(';');
+			horseId = +(info[0].replace(/\D+/g,""));
+			horseSex = info[8].substr(info[8].indexOf("'")).replace(/'/gim, '');
+			horseGP = $('#genetic-body-content strong:eq(1)', html).text().split(': ')[1];
+			horseBreed = $('#characteristics-body-content td.first:eq(0) a', html).attr('href');
+			horseCoat = $('#characteristics-body-content td.first:eq(3)', html).text().split(': ')[1];
+			myName = info[4].substr(16).replace("<b>", '').replace("</b>", '');
+			myName = myName.substr(1, myName.length-2);
+			if ((set.sellrewAddToName == '3') && (coatRarity === 0)) {
+				getCoatRarity(horseBreed + ',' + horseCoat + ',' + horseId);
 			}
 			else {
-				for (i = 0; i < affixesList.length; i++) {
-					if (set.sellrewAffixe.replace(/ /gim, '').toLowerCase() == affixesList[i].split('SELLREW')[0]) {a3 = affixesList[i].split('SELLREW')[1]; break;}
+				if (horseSex.indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
+				if ((isHorseFem) && (set.sellrewFemale == '')) {
+					if (set.sellrewRandom !== '1') {a2 = myName;}
+					else {a2 = fNames[randomInteger(0, fNames.length)];}
 				}
-			}
-		}
-		else {a3 = 'none';}
-		if (set.sellrewFarm !== '') {
-			if (set.sellrewFarm == 'Без завода') {
-				a4 = '';
-			}
-			else {
-				for (i = 0; i < farmsList.length; i++) {
-					if (set.sellrewFarm.replace(/ /gim, '').toLowerCase() == farmsList[i].split('SELLREW')[0]) {a4 = farmsList[i].split('SELLREW')[1]; break;}
+				else if ((isHorseFem == false) && (set.sellrewMale == '')) {
+					if (set.sellrewRandom !== '1') {a2 = myName;}
+					else {a2 = mNames[randomInteger(0, mNames.length)];}
 				}
-			}
-		}
-		else {a4 = '';}
+				else if ((isHorseFem) && (set.sellrewFemale !== '')) {
+					if (set.sellrewRandom !== '1') {a2 = set.sellrewFemale;}
+					else {a2 = fNames[randomInteger(0, fNames.length)];}
+				}
+				else if ((isHorseFem == false) && (set.sellrewMale !== '')) {
+					if (set.sellrewRandom !== '1') {a2 = set.sellrewMale;}
+					else {a2 = mNames[randomInteger(0, mNames.length)];}
+				}
+				switch(set.sellrewAddToName) {
+					case 'none': break;
+					case '0': a2 = a2 + ' ' + horseGP; break;
+					case '1': a2 = a2 + ' ' + horseGP.slice(-5); break;
+					case '2': a2 = a2 + ' ' + $('#competencesValeur', html).text(); break;
+					case '3': a2 = a2 + coatRarity; break;
+				}
+				if (set.sellrewAffixe !== '') {
+					if (set.sellrewAffixe == 'Без аффикса') {
+						a3 = '';
+					}
+					else {
+						for (i = 0; i < affixesList.length; i++) {
+							if (set.sellrewAffixe.replace(/ /gim, '').toLowerCase() == affixesList[i].split('SELLREW')[0]) {a3 = affixesList[i].split('SELLREW')[1]; break;}
+						}
+					}
+				}
+				else {a3 = 'none';}
+				if (set.sellrewFarm !== '') {
+					if (set.sellrewFarm == 'Без завода') {
+						a4 = '';
+					}
+					else {
+						for (i = 0; i < farmsList.length; i++) {
+							if (set.sellrewFarm.replace(/ /gim, '').toLowerCase() == farmsList[i].split('SELLREW')[0]) {a4 = farmsList[i].split('SELLREW')[1]; break;}
+						}
+					}
+				}
+				else {a4 = '';}
 
-		if (a3 == 'none') {rewriteData = 'id=' + a1 + '&name=' + a2 + '&elevage=' + a4;}
-		else {rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;}
-		console.log(rewriteData);
+				if (a3 == 'none') {rewriteData = 'id=' + a1 + '&name=' + a2 + '&elevage=' + a4;}
+				else {rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;}
+				coatRarity = 0;
+				console.log(rewriteData);
+			}	
+		});
 	}
 }
 
 function rewriteHorse(m) {
-	if (m == '1.2') {
-
-	}
+	
 }
 
 sellData = '';
@@ -423,25 +524,7 @@ function formSellData(horse) {
 var mode;
 var subMode;
 function main() {
-	refreshStatus();
-	/*if (mode == 0) {
-		alert('Вы не настроили режим работы скрипта, проверьте настройки!');
-	}
-	else if (mode == 1) {
-		switch(subMode) {
-			case 1: getSales('1.1'); break;
-			case 2: getAffixes('1.2'); break;
-			case 3: getSales('1.3'); break;
-			case 4: getAffixes('1.4'); break;
-		}
-	}
-	else if (mode == 2) {
-		switch(subMode) {
-			case 1: getSales('2.1'); break;
-			case 2: getAffixes('2.2'); break;
-			case 3: getSales('2.3'); break;
-		}
-	}*/
+	refreshStatus(); refreshAm();
 	getSales();
 }
 
