@@ -956,6 +956,13 @@ try {
 		'background-color': '#555555',
 		'color': '#ffffff'
 	});
+	//Запрет выделения текста
+	$('#sellrewPanelSettings').find('p, span').css({
+		'-webkit-user-select': 'none',
+		'-moz-user-select': 'none',
+		'-ms-user-select': 'none',
+		'user-select': 'none'
+	});
 
 	//Загрузка настроек
 	for (i = 0; i < inputs.length; i++) {
