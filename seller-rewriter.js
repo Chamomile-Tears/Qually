@@ -334,19 +334,19 @@ function formRewriteData(horse, m) {
 			if (horse.split('SELLREW')[2].indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
 			if ((isHorseFem) && (set.sellrewFemale == '')) {
 				if (set.sellrewRandom !== '1') {a2 = horse.split('SELLREW')[1];}
-				else {a2 = fNames[randomInteger(0, fNames.length)];}
+				else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
 			}
 			else if ((isHorseFem == false) && (set.sellrewMale == '')) {
 				if (set.sellrewRandom !== '1') {a2 = horse.split('SELLREW')[1];}
-				else {a2 = mNames[randomInteger(0, mNames.length)];}
+				else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
 			}
 			else if ((isHorseFem) && (set.sellrewFemale !== '')) {
 				if (set.sellrewRandom !== '1') {a2 = set.sellrewFemale;}
-				else {a2 = fNames[randomInteger(0, fNames.length)];}
+				else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
 			}
 			else if ((isHorseFem == false) && (set.sellrewMale !== '')) {
 				if (set.sellrewRandom !== '1') {a2 = set.sellrewMale;}
-				else {a2 = mNames[randomInteger(0, mNames.length)];}
+				else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
 			}
 			switch(set.sellrewAddToName) {
 				case 'none': break;
@@ -414,19 +414,19 @@ function formRewriteData(horse, m) {
 				if ($('input[id*="poulain"]', html).next().attr('src').indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
 				if ((isHorseFem) && (set.sellrewFemale == '')) {
 					if (set.sellrewRandom !== '1') {a2 = 'Девочка';}
-					else {a2 = fNames[randomInteger(0, fNames.length)];}
+					else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
 				}
 				else if ((isHorseFem == false) && (set.sellrewMale == '')) {
 					if (set.sellrewRandom !== '1') {a2 = 'Мальчик';}
-					else {a2 = mNames[randomInteger(0, mNames.length)];}
+					else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
 				}
 				else if ((isHorseFem) && (set.sellrewFemale !== '')) {
 					if (set.sellrewRandom !== '1') {a2 = set.sellrewFemale;}
-					else {a2 = fNames[randomInteger(0, fNames.length)];}
+					else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
 				}
 				else if ((isHorseFem == false) && (set.sellrewMale !== '')) {
 					if (set.sellrewRandom !== '1') {a2 = set.sellrewMale;}
-					else {a2 = mNames[randomInteger(0, mNames.length)];}
+					else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
 				}
 				if (set.sellrewAffixe !== '') {
 					if (set.sellrewAffixe == 'Без аффикса') {
@@ -488,19 +488,19 @@ function formRewriteData(horse, m) {
 					if (horseSex.indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
 					if ((isHorseFem) && (set.sellrewFemale == '')) {
 						if (set.sellrewRandom !== '1') {a2 = myName;}
-						else {a2 = fNames[randomInteger(0, fNames.length)];}
+						else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
 					}
 					else if ((isHorseFem == false) && (set.sellrewMale == '')) {
 						if (set.sellrewRandom !== '1') {a2 = myName;}
-						else {a2 = mNames[randomInteger(0, mNames.length)];}
+						else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
 					}
 					else if ((isHorseFem) && (set.sellrewFemale !== '')) {
 						if (set.sellrewRandom !== '1') {a2 = set.sellrewFemale;}
-						else {a2 = fNames[randomInteger(0, fNames.length)];}
+						else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
 					}
 					else if ((isHorseFem == false) && (set.sellrewMale !== '')) {
 						if (set.sellrewRandom !== '1') {a2 = set.sellrewMale;}
-						else {a2 = mNames[randomInteger(0, mNames.length)];}
+						else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
 					}
 					switch(set.sellrewAddToName) {
 						case 'none': break;
