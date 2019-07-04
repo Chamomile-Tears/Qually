@@ -1278,6 +1278,7 @@ try {
 		if (localStorage.getItem('sellrewToggled') == 'true') {$('#toggleBottom').click();}
 		refreshStatus();
 		refreshAm();
+		moveOtherWindows();
 	});
 }
 catch (e) {alert('Ошибка! Обратитесь к разработчику со скриншотом этого окна. Текст ошибки: Interface Error\n' + e);}
