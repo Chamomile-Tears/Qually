@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name		Qually Sell-Rewrite
-// @version	    2.0
+// @version		2.0
 // @namespace	http://tampermonkey.net/
-// @description Выкуп ЗП, продажа и переименовка
-// @author	    https://vk.com/botqually
+// @description	Выкуп ЗП, продажа и переименовка
+// @author		https://vk.com/botqually
 // @match		www.howrse.com/*
 // @match		us.howrse.com/*
 // @match		www.howrse.co.uk/*
@@ -31,8 +31,8 @@
 // @match		www.howrse.bg/*
 // @match		www.howrse.si/*
 // @match		www.howrse.sk/*
-// @require	    https://unpkg.com/popper.js@1/dist/umd/popper.min.js
-// @require	    https://unpkg.com/tippy.js@4
+// @require		https://unpkg.com/popper.js@1/dist/umd/popper.min.js
+// @require		https://unpkg.com/tippy.js@4
 // ==/UserScript==
 
 //$('html').prepend('<div style="background-image: url(/media/equideo/image/background/body/default/body-background-landing-prairie.jpg); position: absolute; height: ' + $(window).height() + 'px; width: ' + $(window).width() + 'px; z-index: 10;"></div>')
