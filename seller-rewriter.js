@@ -1,38 +1,38 @@
 // ==UserScript==
-// @name		      Qually Sell-Rewrite
-// @version	          2.0
-// @namespace	      http://tampermonkey.net/
-// @description       Выкуп ЗП, продажа и переименовка
-// @author	          https://vk.com/botqually
-// @match		      www.howrse.com/*
-// @match		      us.howrse.com/*
-// @match		      www.howrse.co.uk/*
-// @match		      au.howrse.com/*
-// @match		      ca.howrse.com/*
-// @match		      www.howrse.de/*
-// @match		      ouranos.equideow.com/*
-// @match		      gaia.equideow.com/*
-// @match		      www.caballow.com/*
-// @match		      www.howrse.com.pt/*
-// @match		      br.howrse.com/*
-// @match		      www.howrse.co.il/*
-// @match		      www.lowadi.com/*
-// @match		      www.howrse.it/*
-// @match		      nl.howrse.com/*
-// @match		      www.howrse.se/*
-// @match		      www.howrse.pl/*
-// @match		      www.howrse.cz/*
-// @match		      www.howrse.dk/*
-// @match		      www.howrse.fi/*
-// @match		      www.howrse.no/*
-// @match		      ar.howrse.com/*
-// @match		      www.howrse.hu/*
-// @match		      www.howrse.ro/*
-// @match		      www.howrse.bg/*
-// @match		      www.howrse.si/*
-// @match		      www.howrse.sk/*
-// @require	          https://unpkg.com/popper.js@1/dist/umd/popper.min.js
-// @require	          https://unpkg.com/tippy.js@4
+// @name		Qually Sell-Rewrite
+// @version	    2.0
+// @namespace	http://tampermonkey.net/
+// @description Выкуп ЗП, продажа и переименовка
+// @author	    https://vk.com/botqually
+// @match		www.howrse.com/*
+// @match		us.howrse.com/*
+// @match		www.howrse.co.uk/*
+// @match		au.howrse.com/*
+// @match		ca.howrse.com/*
+// @match		www.howrse.de/*
+// @match		ouranos.equideow.com/*
+// @match		gaia.equideow.com/*
+// @match		www.caballow.com/*
+// @match		www.howrse.com.pt/*
+// @match		br.howrse.com/*
+// @match		www.howrse.co.il/*
+// @match		www.lowadi.com/*
+// @match		www.howrse.it/*
+// @match		nl.howrse.com/*
+// @match		www.howrse.se/*
+// @match		www.howrse.pl/*
+// @match		www.howrse.cz/*
+// @match		www.howrse.dk/*
+// @match		www.howrse.fi/*
+// @match		www.howrse.no/*
+// @match		ar.howrse.com/*
+// @match		www.howrse.hu/*
+// @match		www.howrse.ro/*
+// @match		www.howrse.bg/*
+// @match		www.howrse.si/*
+// @match		www.howrse.sk/*
+// @require	    https://unpkg.com/popper.js@1/dist/umd/popper.min.js
+// @require	    https://unpkg.com/tippy.js@4
 // ==/UserScript==
 
 //$('html').prepend('<div style="background-image: url(/media/equideo/image/background/body/default/body-background-landing-prairie.jpg); position: absolute; height: ' + $(window).height() + 'px; width: ' + $(window).width() + 'px; z-index: 10;"></div>')
@@ -177,7 +177,7 @@ function getSales(m) {
 
 var buyCounter = 0;
 function buyHorse(m) {
-	document.title = 'Покупаю лошадь';
+	document.title = 'Покупаю лошадь № ' + buyCounter;
 	post = $.ajax({
 		type: "POST",
 		url : window.location.origin + '/marche/vente/prive/doAcheter',
@@ -186,12 +186,20 @@ function buyHorse(m) {
 	.then(function(result) {
 		buyCounter++;
 		if (salesList[buyCounter] == undefined) {
-			getSales(m); buyCounter = 0;
-			if (m == '1.1') {alert('Все зарезервированные лошади успешно выкуплены!');}
-			else if (m == '1.2') {alert('Все зарезервированные лошади успешно выкуплены и переименованы!');}
-			else if (m == '1.3') {alert('Все зарезервированные лошади успешно выкуплены и проданы!');}
-			else if (m == '1.4') {alert('Все зарезервированные лошади успешно выкуплены, переименованы и проданы!');}
-			$('#sellrewPower').click();
+			if (salesList[buyCounter-1] == undefined) {
+				buyCounter = 0;
+				if (m == '1.1') {alert('Все зарезервированные лошади успешно выкуплены!');}
+				else if (m == '1.2') {alert('Все зарезервированные лошади успешно выкуплены и переименованы!');}
+				else if (m == '1.3') {alert('Все зарезервированные лошади успешно выкуплены и проданы!');}
+				else if (m == '1.4') {alert('Все зарезервированные лошади успешно выкуплены, переименованы и проданы!');}
+				$('#sellrewPower').click();
+			}
+			else {
+				if (m == '1.1') {buyHorse(m);}
+				else if (m == '1.2') {formRewriteData(horsesId[buyCounter-1], m);}
+				else if (m == '1.3') {formSellData((horsesId[buyCounter-1]), m);}
+				else if (m == '1.4') {formRewriteData(horsesId[buyCounter-1], m);}
+			}
 		}
 		else {
 			if (m == '1.1') {buyHorse(m);}
@@ -261,34 +269,40 @@ function getAffixes(m) {
 }
 
 function getFarms(m) {
-	document.title = 'Заводы игрока';
-	farmsList = [];
-	if (localStorage.getItem('farmsList') == null) {
-		get = $.ajax({
-			type: "GET",
-			url: window.location.origin + '/elevage/chevaux/?elevage=all-horses'
-		})
-		.then(function(result) {
-			parse(result);
-			var farms = $('.tab-action-select', html);
-			for (i = 0; i < farms.length; i++) {
-				farmsList[farmsList.length] = $('.tab-action-select', html).eq(i).text().replace(/ /gim, '').toLowerCase() + 'SELLREW' + $('.tab-action-select', html).eq(i).attr('href').split('tab-')[1];
-			}
-			localStorage.setItem('farmsList', farmsList);
-			if ((m == '1.2') || (m == '1.4')) {
-				getSales(m);
-			}
-			else if ((m == '2.1') || (m == '2.3')) {
-				formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
-			}
-		});
+	try {
+		document.title = 'Заводы игрока';
+		farmsList = [];
+		if (localStorage.getItem('farmsList') == null) {
+			get = $.ajax({
+				type: "GET",
+				url: window.location.origin + '/elevage/chevaux/?elevage=all-horses'
+			})
+			.then(function(result) {
+				parse(result);
+				var farms = $('.tab-action-select', html);
+				for (i = 0; i < farms.length; i++) {
+					farmsList[farmsList.length] = $('.tab-action-select', html).eq(i).text().replace(/ /gim, '').toLowerCase() + 'SELLREW' + $('.tab-action-select', html).eq(i).attr('href').split('tab-')[1];
+				}
+				localStorage.setItem('farmsList', farmsList);
+				if ((m == '1.2') || (m == '1.4')) {
+					getSales(m);
+				}
+				else if ((m == '2.1') || (m == '2.3')) {
+					formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
+				}
+			});
+		}
+	}
+	catch(e) {
+		farmsList = [];
+		getFarms();
 	}
 }
 
 var coatRarity = 0;
 var rewriteData = '';
 
-function getCoatRarity(horse) {
+function getCoatRarity(horse, m) {
 	document.title = 'Редкость окраса';
 	if (horse.indexOf('SELLREW') !== -1) {
 		var hor = horse.split('SELLREW')[5];
@@ -321,7 +335,7 @@ function getCoatRarity(horse) {
 				}
 				if (percent < 6) {coatRarity = ' ' + percent + '%';}
 				else {coatRarity = '';}
-				formRewriteData(horse);
+				formRewriteData(horse, m);
 			});
 		});
 	}
@@ -330,8 +344,7 @@ function getCoatRarity(horse) {
 		var ct = horse.split(',')[1];
 		get = $.ajax({
 			type: "GET",
-			url : window.location.origin + url,
-			data: {"qName": url.split('=')[1]}
+			url : window.location.origin + url
 		})
 		.then(function(result) {
 			parse(result);
@@ -346,17 +359,17 @@ function getCoatRarity(horse) {
 			}
 			if (pNum < 6) {coatRarity = ' ' + pNum + '%';}
 			else {coatRarity = '';}
-			formRewriteData(horse.split(',')[2].toString());
+			formRewriteData(horse.split(',')[2].toString(), m);
 		});
 	}
 }
 
 function formRewriteData(horse, m) {
-	document.title = 'Переименую лошадь';
 	var a1; var a2; var a3; var a4; var isHorseFem;
 	if (mode == 1) {
-		if ((set.sellrewAddToName == '3') && (coatRarity === 0)) {
-			getCoatRarity(horse);
+		document.title = 'Переименую лошадь № ' + buyCounter;
+		if ((Number(set.sellrewAddToName) > 2) && (coatRarity === 0)) {
+			getCoatRarity(horse, m);
 		}
 		else {
 			a1 = horse.split('SELLREW')[0];
@@ -383,6 +396,9 @@ function formRewriteData(horse, m) {
 				case '1': a2 = a2 + ' ' + horse.split('SELLREW')[3].slice(-5); break;
 				case '2': a2 = a2 + ' ' + horse.split('SELLREW')[4]; break;
 				case '3': a2 = a2 + coatRarity; break;
+				case '4': a2 = a2 + ' ' + horse.split('SELLREW')[3] + ' ' + coatRarity; break;
+				case '5': a2 = a2 + ' ' + horse.split('SELLREW')[3].slice(-5) + ' ' + coatRarity; break;
+				case '6': a2 = a2 + ' ' + horse.split('SELLREW')[4] + ' ' + coatRarity; break;
 			}
 			if (set.sellrewAffixe !== '') {
 				if (set.sellrewAffixe == 'Без аффикса') {
@@ -412,6 +428,7 @@ function formRewriteData(horse, m) {
 			coatRarity = 0;
 			if (rewriteData.indexOf('undefined') !== -1) {
 				alert('Внимание! Неправильно указан аффикс или завод.\n' + rewriteData);
+				$('#sellrewPower').click();
 			}
 			else {
 				post = $.ajax({
@@ -427,6 +444,7 @@ function formRewriteData(horse, m) {
 		}
 	}
 	else {
+		document.title = 'Переименую лошадь № ' + (listCounter + 1);
 		get = $.ajax({
 			type: "GET",
 			url: window.location.origin + '/elevage/chevaux/cheval?id=' + horse,
@@ -442,8 +460,8 @@ function formRewriteData(horse, m) {
 			horseCoat = $('#characteristics-body-content td.first:eq(3)', html).text().split(': ')[1];
 			myName = info[4].substr(16).replace("<b>", '').replace("</b>", '');
 			myName = myName.substr(1, myName.length-2);
-			if ((set.sellrewAddToName == '3') && (coatRarity === 0)) {
-				getCoatRarity(horseBreed + ',' + horseCoat + ',' + horseId);
+			if ((Number(set.sellrewAddToName) > 2) && (coatRarity === 0)) {
+				getCoatRarity((horseBreed + ',' + horseCoat + ',' + horseId), m);
 			}
 			else {
 				if (horseSex.indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
@@ -469,6 +487,9 @@ function formRewriteData(horse, m) {
 					case '1': a2 = a2 + ' ' + horseGP.slice(-5); break;
 					case '2': a2 = a2 + ' ' + $('#competencesValeur', html).text(); break;
 					case '3': a2 = a2 + coatRarity; break;
+					case '4': a2 = a2 + ' ' + horseGP + ' ' + coatRarity; break;
+					case '5': a2 = a2 + ' ' + horseGP.slice(-5) + ' ' + coatRarity; break;
+					case '6': a2 = a2 + ' ' + $('#competencesValeur', html).text() + ' ' + coatRarity; break;
 				}
 				if (set.sellrewAffixe !== '') {
 					if (set.sellrewAffixe == 'Без аффикса') {
@@ -491,13 +512,17 @@ function formRewriteData(horse, m) {
 						}
 					}
 				}
-				else {a4 = '';}
+				else {
+					a4 = $('div.elevage.align-center a', html).attr('href').split('=')[1];
+					if (a4 == 'all-horses') {a4 = '';}
+				}
 
 				if (a3 == 'none') {rewriteData = 'id=' + a1 + '&name=' + a2 + '&elevage=' + a4;}
 				else {rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;}
 				coatRarity = 0;
 				if (rewriteData.indexOf('undefined') !== -1) {
 					alert('Внимание! Неправильно указан аффикс или завод.\n' + rewriteData);
+					$('#sellrewPower').click();
 				}
 				else {
 					post = $.ajax({
@@ -528,7 +553,8 @@ function formRewriteData(horse, m) {
 
 sellData = '';
 function formSellData(horse, m) {
-	document.title = 'Продаю лошадь';
+	if (mode == 1) {document.title = 'Продаю лошадь № ' + buyCounter;;}
+	else {document.title = 'Продаю лошадь № ' + (listCounter+1);}
 	var a1;
 	var id;
 	if (horse.indexOf('SELLREW') !== -1) {id = horse.split('SELLREW')[0];}
@@ -549,7 +575,7 @@ function formSellData(horse, m) {
 		if (set.sellrewAuction == '1') {type = 'enchere';}
 		else if (set.sellrewDirect == '1') {type = 'direct';}
 		else if (set.sellrewReserved == '1') {type = 'prive';}
-		else {alert('Внимание! Вы не выбрали тип продажи!');}
+		else {alert('Внимание! Вы не выбрали тип продажи!'); $('#sellrewPower').click();}
 		a1 = 'go=1&' + name + '=' + value + '&chevalSelection=' + id + '&divin=0&venteType=' + type + '&feesCollectedPercent=10&';
 		if (($('.header-logo').html().indexOf('vip') == -1) && ($('.header-logo').html().indexOf('pegase') == -1)) {a1 += 'hasAddon=&canTransactionPass=1&canVendreEquipe=1&';}
 		else {a1 += 'hasAddon=1&canTransactionPass=1&canVendreEquipe=1&';}
@@ -613,6 +639,7 @@ function formSellData(horse, m) {
 		}
 		else {
 			alert("Внимание! Вы не установили цену для продажи лошади!");
+			$('#sellrewPower').click();
 		}
 	});
 }
@@ -775,7 +802,7 @@ try {
 	$('#rewriteOptions2').append('<span class="tip" data-tippy-content="Называть жеребят случайными именами из списка"><input id="sellrewRandom" type="checkbox" style="position:relative; margin:0 5px 0 5px; top:1px"></span>');
 	$('#rewriteOptions').append('<div style="margin:5px 0 0 5px" id="rewriteOptions3"></div>');
 	$('#rewriteOptions3').append('<span style="color:#fff; cursor:default;">Добавить к имени:</span>');
-	$('#rewriteOptions3').append('<select id="sellrewAddToName" style="margin-top:3px; width:175px; background-color:#fff"><option value="none">Не добавлять</option><option value="0">ГП ххххх.хх</option><option value="1">ГП хх.хх</option><option value="2">Навыки</option><option value="3">Редкая масть (1-5%)</option></select>');
+	$('#rewriteOptions3').append('<select id="sellrewAddToName" style="margin-top:3px; width:175px; background-color:#fff"><option value="none">Не добавлять</option><option value="0">ГП ххххх.хх</option><option value="1">ГП хх.хх</option><option value="2">Навыки</option><option value="3">Редкая масть (1-5%)</option><option value="4">ГП ххххх.хх + Редкая масть (1-5%)</option><option value="5">ГП хх.хх + Редкая масть (1-5%)</option><option value="3">Навыки + Редкая масть (1-5%)</option></select>');
 	//Продажа
 	$('#sellrewPanelSettings').append('<div id="sellOptions" style="float:left;width:185px; height:264px; margin:10px 5px 0 5px; padding:5px 5px 8px 8px; border:1px solid white; border-radius: 5px; font-size:14px; color:#fff"></div>');
 	$('#sellOptions').append('<div style="margin:5px 0 0 5px" id="sellOptions1"></div>');
@@ -817,24 +844,6 @@ try {
 	//Сбросить настройки
 	$('#sellrewPanelSettings').append('<div style="margin-top:10px; margin-left:auto; margin-right:auto; text-align:center; widtn:150px; height:15px;"><a id="sellrewResetSettings" style="font-size:14px; font-weight:bold; color:#fff">Сбросить настройки</a></div>');
 	/*------------------------------------------------------------------------------------*/
-	//Смещение относительно других qually-скриптов, значок валюты в скрипте
-	$(document).ready(function() {
-		if (($('html[dir*="r"]').has($('.leftSidedPanel'))) && ($('.leftSidedPanel').eq($('.leftSidedPanel').length-4).attr('id') !== 'sellrewPanel')) {
-			var top1 = $('.leftSidedPanel').last().css('top');
-			if (top1 !== undefined) {top1 = Number(top1.replace('px', ''));}
-			var height1 = Number($('.leftSidedPanel').eq($('.leftSidedPanel').length-4).height());
-			var a = top1 + height1 + 20;
-			$('#sellrewPanel').css('top', a + 'px');
-			$('#sellrewPanelSettings').css('top', a + 'px');
-		}
-		if (set.sellrewBuyPasses == 1) {
-			$('#pictureValute').attr('src', '/media/equideo/image/fonctionnels/20/pass.png');
-		}
-		if (localStorage.getItem('listToSaleRewrite') !== null) {listToSaleRewrite = localStorage.getItem('listToSaleRewrite').split(',');}
-		refreshStatus();
-		refreshAm();
-	});
-
 	var makeInputs = setInterval(function() {
 		if (location.href.indexOf('elevage/chevaux/?elevage=') !== -1) {
 			if (($('.chooseHorse').length == 0) || ($('.sellNumber').length == 0)) {
@@ -953,6 +962,7 @@ try {
 				moveOtherWindows(j);
 			}
 		}
+		localStorage.setItem('sellrewToggled', toggled);
 	});
 
 	function moveOtherWindows(j) {
@@ -1052,7 +1062,8 @@ try {
 		}
 		else if (mode == 2) {
 			if ((location.href.indexOf('/elevage/chevaux/?elevage') !== -1) || (sellrewStartup == 1)) {
-				startUp();
+				if ((localStorage.getItem('listToSaleRewrite') !== null) && (localStorage.getItem('listToSaleRewrite').length > 1)) {startUp();}
+				else {$('#sellrewAddList').click(); startUp();}
 			}
 			else {
 				alert('Запуск скрипта по текущим настройкам производится со страницы заводов (вкладка "Коневодство" -> "Лошади").');
@@ -1210,5 +1221,24 @@ try {
 			if (e.target !== $(this).find('.checkbox')[0]) {($(this).find('.checkbox'))[0].click();
 		}
 	}});
+
+	//Смещение относительно других qually-скриптов, значок валюты в скрипте
+	$(document).ready(function() {
+		if (($('html[dir*="r"]').has($('.leftSidedPanel'))) && ($('.leftSidedPanel').eq($('.leftSidedPanel').length-4).attr('id') !== 'sellrewPanel')) {
+			var top1 = $('.leftSidedPanel').last().css('top');
+			if (top1 !== undefined) {top1 = Number(top1.replace('px', ''));}
+			var height1 = Number($('.leftSidedPanel').eq($('.leftSidedPanel').length-4).height());
+			var a = top1 + height1 + 20;
+			$('#sellrewPanel').css('top', a + 'px');
+			$('#sellrewPanelSettings').css('top', a + 'px');
+		}
+		if (set.sellrewBuyPasses == 1) {
+			$('#pictureValute').attr('src', '/media/equideo/image/fonctionnels/20/pass.png');
+		}
+		if (localStorage.getItem('listToSaleRewrite') !== null) {listToSaleRewrite = localStorage.getItem('listToSaleRewrite').split(',');}
+		if (localStorage.getItem('sellrewToggled') == 'true') {$('#toggleBottom').click();}
+		refreshStatus();
+		refreshAm();
+	});
 }
 catch (e) {alert('Ошибка! Обратитесь к разработчику со скриншотом этого окна. Текст ошибки: Interface Error\n' + e);}
