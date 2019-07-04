@@ -55,6 +55,7 @@ var fNames = femaleNames.split(',');
 var mNames = maleNames.split(',');
 var mode;
 var subMode;
+var listCounter = 0;
 //Загрузка настроек
 var inputs = ['sellrewBuyPrice', 'sellrewFarm', 'sellrewAffixe', 'sellrewMale', 'sellrewFemale', 'sellrewAuctionEquus', 'sellrewDirectEquus', 'sellrewDirectPasses', 'sellrewReserveEquus', 'sellrewReservePasses', 'sellrewBreeder', 'sellrewSelectAmount', 'sellrewHorseNumber'];
 var selects = ['sellrewAddToName'];
@@ -102,6 +103,7 @@ function fillSalesList(i) {
 }
 
 function getSales(m) {
+	document.title = 'Страница продаж';
 	salesList = [];
 	if (localStorage.getItem('race-ane') == null) {
 		get = $.ajax({
@@ -128,7 +130,7 @@ function getSales(m) {
 					for (i = 0; i < $('#table-0 tr.highlight', html).length; i++) {
 						fillSalesList(i);
 					}
-					buyHorse();
+					buyHorse(m);
 				}
 				else {
 					if ((set.sellrewRewrite == '2') && (set.sellrewSell == '2')) {
@@ -153,7 +155,7 @@ function getSales(m) {
 					for (i = 0; i < $('#table-0 tr.highlight', html).length; i++) {
 						fillSalesList(i);
 					}
-					buyHorse();
+					buyHorse(m);
 				}
 				else {
 					if ((set.sellrewRewrite == '2') && (set.sellrewSell == '2')) {
@@ -175,6 +177,7 @@ function getSales(m) {
 
 var buyCounter = 0;
 function buyHorse(m) {
+	document.title = 'Покупаю лошадь';
 	post = $.ajax({
 		type: "POST",
 		url : window.location.origin + '/marche/vente/prive/doAcheter',
@@ -186,14 +189,14 @@ function buyHorse(m) {
 			getSales(m); buyCounter = 0;
 			if (m == '1.1') {alert('Все зарезервированные лошади успешно выкуплены!');}
 			else if (m == '1.2') {alert('Все зарезервированные лошади успешно выкуплены и переименованы!');}
-			localStorage.setItem('sellrewStartup', 0);
-			localStorage.removeItem('sellrewWorkPlace');
-			location.reload();
+			else if (m == '1.3') {alert('Все зарезервированные лошади успешно выкуплены и проданы!');}
+			else if (m == '1.4') {alert('Все зарезервированные лошади успешно выкуплены, переименованы и проданы!');}
+			$('#sellrewPower').click();
 		}
 		else {
 			if (m == '1.1') {buyHorse(m);}
 			else if (m == '1.2') {formRewriteData(horsesId[buyCounter-1], m);}
-			else if (m == '1.3') {formSellData(horsesId[buyCounter-1], m);}
+			else if (m == '1.3') {formSellData((horsesId[buyCounter-1]), m);}
 			else if (m == '1.4') {formRewriteData(horsesId[buyCounter-1], m);}
 		}
 	});
@@ -202,6 +205,7 @@ function buyHorse(m) {
 var teamAffixesCount = 0;
 var teamAffixes = [];
 function getTeamAffixes(m) {
+	document.title = 'Командные аффиксы';
 	if ($('a.level-2.grid-table.width-100.align-middle[href^="/equipe/"]').length !== 0) {
 		get = $.ajax({
 			type: "GET",
@@ -236,6 +240,7 @@ function getTeamAffixes(m) {
 }
 
 function getAffixes(m) {
+	document.title = 'Аффиксы игрока';
 	affixesList = [];
 	if (localStorage.getItem('affixesList') == null) {
 		get = $.ajax({
@@ -256,6 +261,7 @@ function getAffixes(m) {
 }
 
 function getFarms(m) {
+	document.title = 'Заводы игрока';
 	farmsList = [];
 	if (localStorage.getItem('farmsList') == null) {
 		get = $.ajax({
@@ -272,6 +278,9 @@ function getFarms(m) {
 			if ((m == '1.2') || (m == '1.4')) {
 				getSales(m);
 			}
+			else if ((m == '2.1') || (m == '2.3')) {
+				formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
+			}
 		});
 	}
 }
@@ -280,6 +289,7 @@ var coatRarity = 0;
 var rewriteData = '';
 
 function getCoatRarity(horse) {
+	document.title = 'Редкость окраса';
 	if (horse.indexOf('SELLREW') !== -1) {
 		var hor = horse.split('SELLREW')[5];
 		post = $.ajax({
@@ -336,12 +346,13 @@ function getCoatRarity(horse) {
 			}
 			if (pNum < 6) {coatRarity = ' ' + pNum + '%';}
 			else {coatRarity = '';}
-			formRewriteData(horse.split(',')[2]);
+			formRewriteData(horse.split(',')[2].toString());
 		});
-	}	
+	}
 }
 
 function formRewriteData(horse, m) {
+	document.title = 'Переименую лошадь';
 	var a1; var a2; var a3; var a4; var isHorseFem;
 	if (mode == 1) {
 		if ((set.sellrewAddToName == '3') && (coatRarity === 0)) {
@@ -399,15 +410,20 @@ function formRewriteData(horse, m) {
 			if (a3 == 'none') {rewriteData = 'id=' + a1 + '&name=' + a2 + '&elevage=' + a4;}
 			else {rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;}
 			coatRarity = 0;
-			post = $.ajax({
-				type: "POST",
-				url: window.location.origin + '/elevage/chevaux/doUpdateProfil',
-				data: rewriteData
-			})
-			.then(function(result) {
-				if (m == '1.2') {buyHorse(m);}
-				else if (m == '1.4') {formSellData(horsesId[buyCounter-1], m);}
-			});
+			if (rewriteData.indexOf('undefined') !== -1) {
+				alert('Внимание! Неправильно указан аффикс или завод.\n' + rewriteData);
+			}
+			else {
+				post = $.ajax({
+					type: "POST",
+					url: window.location.origin + '/elevage/chevaux/doUpdateProfil',
+					data: rewriteData
+				})
+				.then(function(result) {
+					if (m == '1.2') {buyHorse(m);}
+					else if (m == '1.4') {formSellData(horsesId[buyCounter-1], m);}
+				});
+			}	
 		}
 	}
 	else {
@@ -480,14 +496,39 @@ function formRewriteData(horse, m) {
 				if (a3 == 'none') {rewriteData = 'id=' + a1 + '&name=' + a2 + '&elevage=' + a4;}
 				else {rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;}
 				coatRarity = 0;
-				console.log(rewriteData);
-			}	
+				if (rewriteData.indexOf('undefined') !== -1) {
+					alert('Внимание! Неправильно указан аффикс или завод.\n' + rewriteData);
+				}
+				else {
+					post = $.ajax({
+						type: "POST",
+						url: window.location.origin + '/elevage/chevaux/doUpdateProfil',
+						data: rewriteData
+					})
+					.then(function(result) {
+						if (m == '2.1') {
+							listCounter++;
+							if (localStorage.getItem('listToSaleRewrite').split(',')[listCounter] !== undefined) {
+								formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
+							}
+							else {
+								alert('Все отмеченные лошади успешно переименованы!');
+								$('#sellrewPower').click();
+							}
+						}
+						else if (m == '2.3') {
+							formSellData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
+						}
+					});
+				}	
+			}
 		});
 	}
 }
 
 sellData = '';
 function formSellData(horse, m) {
+	document.title = 'Продаю лошадь';
 	var a1;
 	var id;
 	if (horse.indexOf('SELLREW') !== -1) {id = horse.split('SELLREW')[0];}
@@ -517,12 +558,13 @@ function formSellData(horse, m) {
 				valuteType = 'soft';
 				prix = set.sellrewAuctionEquus;
 				if (($('.header-logo').html().indexOf('vip') == -1) && ($('.header-logo').html().indexOf('pegase') == -1)) {} else {a1 += 'seller=user&';}
+				a1 += 'currencyType='+ valuteType + '&amountAuction' + (valuteType.charAt(0).toUpperCase() + valuteType.slice(1)) + '=' + prix + '&reservationType=prive&reservation=';
 			}
 			else {
 				if (set.sellrewDirectPasses == '') {valuteType = 'soft'; prix = set.sellrewDirectEquus;} else {valuteType = 'hard'; prix = set.sellrewDirectPasses;}
 				a1 += 'seller=user&';
+				a1 += 'currencyType='+ valuteType + '&amount' + (type.charAt(0).toUpperCase() + type.slice(1)) + (valuteType.charAt(0).toUpperCase() + valuteType.slice(1)) + '=' + prix + '&reservationType=prive&reservation=';
 			}
-			a1 += 'currencyType='+ valuteType + '&amount' + (type.charAt(0).toUpperCase() + type.slice(1)) + (valuteType.charAt(0).toUpperCase() + valuteType.slice(1)) + '=' + prix + '&reservationType=prive&reservation=';
 		}
 		else if ((type == 'prive') && (set.sellrewTeam !== '1')) {
 			if (set.sellrewReservePasses == '') {valuteType = 'soft'; prix = set.sellrewReserveEquus;} else {valuteType = 'hard'; prix = set.sellrewReservePasses;}
@@ -533,20 +575,68 @@ function formSellData(horse, m) {
 			a1 += 'reservation=&reservationType=equipe&currencyType=' + valuteType + '&amountPrivate' + (valuteType.charAt(0).toUpperCase() + valuteType.slice(1)) + '=' + prix;
 		}
 		sellData = a1;
-		post = $.ajax({
-			type: "POST",
-			url: window.location.origin + "/marche/vente/doVendreCheval",
-			data: sellData
-		})
-		.then(function(result) {
-			if ((m == '1.3') || (m == '1.4')) {buyHorse(m);}
-		});
+		var checkSellData = true;
+		switch(type) {
+			case 'enchere': if (set.sellrewAuctionEquus == '') {checkSellData = false;} break;
+			case 'direct': if ((set.sellrewDirectEquus == '') && (set.sellrewDirectPasses == '')) {checkSellData = false;} break;
+			case 'prive': if ((set.sellrewReserveEquus == '') && (set.sellrewReservePasses == '')) {checkSellData = false;} break;
+		}
+		if (checkSellData) {
+			post = $.ajax({
+				type: "POST",
+				url: window.location.origin + "/marche/vente/doVendreCheval",
+				data: sellData
+			})
+			.then(function(result) {
+				if ((m == '1.3') || (m == '1.4')) {buyHorse(m);}
+				else if (m == '2.2') {
+					listCounter++;
+					if (localStorage.getItem('listToSaleRewrite').split(',')[listCounter] !== undefined) {
+						formSellData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
+					}
+					else {
+						alert('Все отмеченные лошади успешно проданы!');
+						$('#sellrewPower').click();
+					}
+				}
+				else if (m == '2.3') {
+					listCounter++;
+					if (localStorage.getItem('listToSaleRewrite').split(',')[listCounter] !== undefined) {
+						formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
+					}
+					else {
+						alert('Все отмеченные лошади успешно переименованы и проданы!');
+						$('#sellrewPower').click();
+					}
+				}
+			});
+		}
+		else {
+			alert("Внимание! Вы не установили цену для продажи лошади!");
+		}
 	});
 }
 
 function main() {
 	refreshStatus(); refreshAm();
-	getSales();
+	if (mode == 1) {
+		switch(subMode) {
+			case 1: getSales('1.1'); break;
+			case 2: getTeamAffixes('1.2'); break;
+			case 3: getSales('1.3'); break;
+			case 4: getTeamAffixes('1.4'); break;
+		}
+	}
+	else if (mode == 2) {
+		switch(subMode) {
+			case 1: getTeamAffixes('2.1'); break;
+			case 2: formSellData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), '2.2'); break;
+			case 3: getTeamAffixes('2.3'); break;
+		}
+	}
+	else {
+		alert('Вы не настроили режимы работы!');
+	}
 }
 
 $(document).ready(function() {
