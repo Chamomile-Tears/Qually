@@ -802,7 +802,7 @@ try {
 	$('#rewriteOptions2').append('<span class="tip" data-tippy-content="Называть жеребят случайными именами из списка"><input id="sellrewRandom" type="checkbox" style="position:relative; margin:0 5px 0 5px; top:1px"></span>');
 	$('#rewriteOptions').append('<div style="margin:5px 0 0 5px" id="rewriteOptions3"></div>');
 	$('#rewriteOptions3').append('<span style="color:#fff; cursor:default;">Добавить к имени:</span>');
-	$('#rewriteOptions3').append('<select id="sellrewAddToName" style="margin-top:3px; width:175px; background-color:#fff"><option value="none">Не добавлять</option><option value="0">ГП ххххх.хх</option><option value="1">ГП хх.хх</option><option value="2">Навыки</option><option value="3">Редкая масть (1-5%)</option><option value="4">ГП ххххх.хх + Редкая масть (1-5%)</option><option value="5">ГП хх.хх + Редкая масть (1-5%)</option><option value="3">Навыки + Редкая масть (1-5%)</option></select>');
+	$('#rewriteOptions3').append('<select id="sellrewAddToName" style="margin-top:3px; width:175px; background-color:#fff"><option value="none">Не добавлять</option><option value="0">ГП ххххх.хх</option><option value="1">ГП хх.хх</option><option value="2">Навыки</option><option value="3">Редкая масть (1-5%)</option><option value="4">ГП ххххх.хх + Редкая масть (1-5%)</option><option value="5">ГП хх.хх + Редкая масть (1-5%)</option><option value="6">Навыки + Редкая масть (1-5%)</option></select>');
 	//Продажа
 	$('#sellrewPanelSettings').append('<div id="sellOptions" style="float:left;width:185px; height:264px; margin:10px 5px 0 5px; padding:5px 5px 8px 8px; border:1px solid white; border-radius: 5px; font-size:14px; color:#fff"></div>');
 	$('#sellOptions').append('<div style="margin:5px 0 0 5px" id="sellOptions1"></div>');
