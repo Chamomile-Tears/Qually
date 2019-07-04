@@ -959,6 +959,7 @@ try {
 	j = 2;
 	var toggled = false;
 	$('#toggleBottom').click(function() {
+		console.log('1');
 		$('#sellrewButtons1').slideToggle({duration:250, easing:'swing'});
 		if (($('.leftSidedPanel').length == 2) || ($('.leftSidedPanel').last().prev().attr('id') == "sellrewPanel")) {
 			if (toggled) {
