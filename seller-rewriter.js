@@ -667,26 +667,37 @@ function formSellData(horse, m) {
 }
 
 function main() {
+	var startWork
 	refreshStatus(); refreshAm();
 	if (mode == 1) {
-		var startWork = confirm('Включён режим продажи лошадей. Нажмите ОК, чтобы продолжить, или Отмена, чтобы остановить скрипт.');
-		if (startWork) {
-			switch(subMode) {
-				case 1: getSales('1.1'); break;
-				case 2: getTeamAffixes('1.2'); break;
-				case 3: getSales('1.3'); break;
-				case 4: getTeamAffixes('1.4'); break;
-			}
-		}
-		else {
-			$('#sellrewPower').click();
+		switch(subMode) {
+			case 1: getSales('1.1'); break;
+			case 2: getTeamAffixes('1.2'); break;
+			case 3: 
+				startWork = confirm('Включён режим продажи лошадей. Нажмите ОК, чтобы продолжить, или Отмена, чтобы остановить скрипт.');
+				if (startWork) {getSales('1.3');}
+				else {$('#sellrewPower').click();}
+			break;
+			case 4: 
+				startWork = confirm('Включён режим продажи лошадей. Нажмите ОК, чтобы продолжить, или Отмена, чтобы остановить скрипт.');
+				if (startWork) {getTeamAffixes('1.4'); }
+				else {$('#sellrewPower').click();}
+			break;
 		}
 	}
 	else if (mode == 2) {
 		switch(subMode) {
 			case 1: getTeamAffixes('2.1'); break;
-			case 2: formSellData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), '2.2'); break;
-			case 3: getTeamAffixes('2.3'); break;
+			case 2: 
+				startWork = confirm('Включён режим продажи лошадей. Нажмите ОК, чтобы продолжить, или Отмена, чтобы остановить скрипт.');
+				if (startWork) {formSellData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), '2.2');}
+				else {$('#sellrewPower').click();}
+			break;
+			case 3:
+				startWork = confirm('Включён режим продажи лошадей. Нажмите ОК, чтобы продолжить, или Отмена, чтобы остановить скрипт.');
+				if (startWork) {getTeamAffixes('2.3');}
+				else {$('#sellrewPower').click();}
+			break;
 		}
 	}
 	else {
