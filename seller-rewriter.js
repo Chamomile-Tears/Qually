@@ -669,11 +669,17 @@ function formSellData(horse, m) {
 function main() {
 	refreshStatus(); refreshAm();
 	if (mode == 1) {
-		switch(subMode) {
-			case 1: getSales('1.1'); break;
-			case 2: getTeamAffixes('1.2'); break;
-			case 3: getSales('1.3'); break;
-			case 4: getTeamAffixes('1.4'); break;
+		var startWork = confirm('Включён режим продажи лошадей. Нажмите ОК, чтобы продолжить, или Отмена, чтобы остановить скрипт.');
+		if (startWork) {
+			switch(subMode) {
+				case 1: getSales('1.1'); break;
+				case 2: getTeamAffixes('1.2'); break;
+				case 3: getSales('1.3'); break;
+				case 4: getTeamAffixes('1.4'); break;
+			}
+		}
+		else {
+			$('#sellrewPower').click();
 		}
 	}
 	else if (mode == 2) {
