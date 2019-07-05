@@ -208,48 +208,44 @@ function getTeamAffixes(m) {
 function getAffixes(m) {
 	document.title = 'Аффиксы игрока';
 	affixesList = [];
-	if (localStorage.getItem('affixesList') == null) {
-		get = $.ajax({
-			type: "GET",
-			url: window.location.origin + '/elevage/bureau/?type=affixe'
-		})
-		.then(function(result) {
-			parse(result);
-			var affs = $('tr[height^="40"] .affixe', html);
-			for (i = 0; i < affs.length; i++) {
-				affixesList[affixesList.length] = $('tr[height^="40"] .affixe', html).eq(i).text().replace(/ /gim, '').toLowerCase() + 'SELLREW' + $('tr[height^="40"] .affixe', html).eq(i).attr('href').split('id=')[1];
-			}
-			if (teamAffixes.length > 0) {affixesList = affixesList.concat(teamAffixes);}
-			localStorage.setItem('affixesList', affixesList);
-			getFarms(m);
-		});
-	}
+	get = $.ajax({
+		type: "GET",
+		url: window.location.origin + '/elevage/bureau/?type=affixe'
+	})
+	.then(function(result) {
+		parse(result);
+		var affs = $('tr[height^="40"] .affixe', html);
+		for (i = 0; i < affs.length; i++) {
+			affixesList[affixesList.length] = $('tr[height^="40"] .affixe', html).eq(i).text().replace(/ /gim, '').toLowerCase() + 'SELLREW' + $('tr[height^="40"] .affixe', html).eq(i).attr('href').split('id=')[1];
+		}
+		if (teamAffixes.length > 0) {affixesList = affixesList.concat(teamAffixes);}
+		localStorage.setItem('affixesList', affixesList);
+		getFarms(m);
+	});
 }
 
 function getFarms(m) {
 	try {
 		document.title = 'Заводы игрока';
 		farmsList = [];
-		if (localStorage.getItem('farmsList') == null) {
-			get = $.ajax({
-				type: "GET",
-				url: window.location.origin + '/elevage/chevaux/?elevage=all-horses'
-			})
-			.then(function(result) {
-				parse(result);
-				var farms = $('.tab-action-select', html);
-				for (i = 0; i < farms.length; i++) {
-					farmsList[farmsList.length] = $('.tab-action-select', html).eq(i).text().replace(/ /gim, '').toLowerCase() + 'SELLREW' + $('.tab-action-select', html).eq(i).attr('href').split('tab-')[1];
-				}
-				localStorage.setItem('farmsList', farmsList);
-				if ((m == '1.2') || (m == '1.4')) {
-					getSales(m);
-				}
-				else if ((m == '2.1') || (m == '2.3')) {
-					formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
-				}
-			});
-		}
+		get = $.ajax({
+			type: "GET",
+			url: window.location.origin + '/elevage/chevaux/?elevage=all-horses'
+		})
+		.then(function(result) {
+			parse(result);
+			var farms = $('.tab-action-select', html);
+			for (i = 0; i < farms.length; i++) {
+				farmsList[farmsList.length] = $('.tab-action-select', html).eq(i).text().replace(/ /gim, '').toLowerCase() + 'SELLREW' + $('.tab-action-select', html).eq(i).attr('href').split('tab-')[1];
+			}
+			localStorage.setItem('farmsList', farmsList);
+			if ((m == '1.2') || (m == '1.4')) {
+				getSales(m);
+			}
+			else if ((m == '2.1') || (m == '2.3')) {
+				formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
+			}
+		});
 	}
 	catch(e) {
 		farmsList = [];
@@ -473,100 +469,130 @@ function formRewriteData(horse, m) {
 				});
 			}
 			else {
-				var info = $('script:contains("chevalAge")', html).text().replace(/[^a-zA-Zа-яА-Я0-9; =.'</>]/gim, '').split(';');
-				horseId = +(info[0].replace(/\D+/g,""));
-				horseSex = info[8].substr(info[8].indexOf("'")).replace(/'/gim, '');
-				horseGP = $('#genetic-body-content strong:eq(1)', html).text().split(': ')[1];
-				horseBreed = $('#characteristics-body-content td.first:eq(0) a', html).attr('href');
-				horseCoat = $('#characteristics-body-content td.first:eq(3)', html).text().split(': ')[1];
-				myName = info[4].substr(16).replace("<b>", '').replace("</b>", '');
-				myName = myName.substr(1, myName.length-2);
-				if ((Number(set.sellrewAddToName) > 2) && (coatRarity === 0)) {
-					getCoatRarity((horseBreed + ',' + horseCoat + ',' + horseId), m);
+				var unusual = false;
+				if ($('div.element img', html).length > 0) {
+					if (($('div.element img', html).attr('src').indexOf('divin') !== -1) || ($('div.element img', html).attr('src').indexOf('chimerique') !== -1) || ($('div.element img', html).attr('src').indexOf('feuille-sauvage') !== -1) || ($('div.element img', html).attr('src').indexOf('arbre-ancestral') !== -1)) {unusual = true;}
+				}
+				var death = $('span[style*="ressusciter-cheval"]', html);
+				var old = $('span[style*="2/paradis"]', html);
+				if ((death.length !== 0) || (old.length !== 0)) {unusual = true;}
+				if (unusual == false) {
+					var info = $('script:contains("chevalAge")', html).text().replace(/[^a-zA-Zа-яА-Я0-9; =.'</>]/gim, '').split(';');
+					horseId = +(info[0].replace(/\D+/g,""));
+					horseSex = info[8].substr(info[8].indexOf("'")).replace(/'/gim, '');
+					horseGP = $('#genetic-body-content strong:eq(1)', html).text().split(': ')[1];
+					horseBreed = $('#characteristics-body-content td.first:eq(0) a', html).attr('href');
+					horseCoat = $('#characteristics-body-content td.first:eq(3)', html).text().split(': ')[1];
+					myName = info[4].substr(16).replace("<b>", '').replace("</b>", '');
+					myName = myName.substr(1, myName.length-2);
+					if ((Number(set.sellrewAddToName) > 2) && (coatRarity === 0)) {
+						getCoatRarity((horseBreed + ',' + horseCoat + ',' + horseId), m);
+					}
+					else {
+						if (horseSex.indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
+						if ((isHorseFem) && (set.sellrewFemale == '')) {
+							if (set.sellrewRandom !== '1') {a2 = myName;}
+							else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
+						}
+						else if ((isHorseFem == false) && (set.sellrewMale == '')) {
+							if (set.sellrewRandom !== '1') {a2 = myName;}
+							else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
+						}
+						else if ((isHorseFem) && (set.sellrewFemale !== '')) {
+							if (set.sellrewRandom !== '1') {a2 = set.sellrewFemale;}
+							else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
+						}
+						else if ((isHorseFem == false) && (set.sellrewMale !== '')) {
+							if (set.sellrewRandom !== '1') {a2 = set.sellrewMale;}
+							else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
+						}
+						switch(set.sellrewAddToName) {
+							case 'none': break;
+							case '0': a2 = a2 + ' ' + horseGP; break;
+							case '1': a2 = a2 + ' ' + horseGP.slice(-5); break;
+							case '2': a2 = a2 + ' ' + $('#competencesValeur', html).text(); break;
+							case '3': a2 = a2 + coatRarity; break;
+							case '4': a2 = a2 + ' ' + horseGP + ' ' + coatRarity; break;
+							case '5': a2 = a2 + ' ' + horseGP.slice(-5) + ' ' + coatRarity; break;
+							case '6': a2 = a2 + ' ' + $('#competencesValeur', html).text() + ' ' + coatRarity; break;
+						}
+						if (set.sellrewAffixe !== '') {
+							if (set.sellrewAffixe == 'Без аффикса') {
+								a3 = '';
+							}
+							else {
+								for (i = 0; i < affixesList.length; i++) {
+									if (set.sellrewAffixe.replace(/ /gim, '').toLowerCase() == affixesList[i].split('SELLREW')[0]) {a3 = affixesList[i].split('SELLREW')[1]; break;}
+								}
+							}
+						}
+						else {a3 = 'none';}
+						if (set.sellrewFarm !== '') {
+							if (set.sellrewFarm == 'Без завода') {
+								a4 = '';
+							}
+							else {
+								for (i = 0; i < farmsList.length; i++) {
+									if (set.sellrewFarm.replace(/ /gim, '').toLowerCase() == farmsList[i].split('SELLREW')[0]) {a4 = farmsList[i].split('SELLREW')[1]; break;}
+								}
+							}
+						}
+						else {
+							a4 = $('div.elevage.align-center a', html).attr('href').split('=')[1];
+							if (a4 == 'all-horses') {a4 = '';}
+						}
+
+						if (a3 == 'none') {rewriteData = 'id=' + a1 + '&name=' + a2 + '&elevage=' + a4;}
+						else {rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;}
+						coatRarity = 0;
+						if (rewriteData.indexOf('undefined') !== -1) {
+							alert('Внимание! Неправильно указан аффикс или завод.\n' + rewriteData);
+							$('#sellrewPower').click();
+						}
+						else {
+							post = $.ajax({
+								type: "POST",
+								url: window.location.origin + '/elevage/chevaux/doUpdateProfil',
+								data: rewriteData
+							})
+							.then(function(result) {
+								if (m == '2.1') {
+									listCounter++;
+									if (localStorage.getItem('listToSaleRewrite').split(',')[listCounter] !== undefined) {
+										formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
+									}
+									else {
+										alert('Все отмеченные лошади успешно переименованы!');
+										$('#sellrewPower').click();
+									}
+								}
+								else if (m == '2.3') {
+									formSellData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
+								}
+							});
+						}	
+					}
 				}
 				else {
-					if (horseSex.indexOf('fem') == -1) {isHorseFem = false} else {isHorseFem = true;}
-					if ((isHorseFem) && (set.sellrewFemale == '')) {
-						if (set.sellrewRandom !== '1') {a2 = myName;}
-						else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
-					}
-					else if ((isHorseFem == false) && (set.sellrewMale == '')) {
-						if (set.sellrewRandom !== '1') {a2 = myName;}
-						else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
-					}
-					else if ((isHorseFem) && (set.sellrewFemale !== '')) {
-						if (set.sellrewRandom !== '1') {a2 = set.sellrewFemale;}
-						else {a2 = fNames[randomInteger(0, (fNames.length - 1))];}
-					}
-					else if ((isHorseFem == false) && (set.sellrewMale !== '')) {
-						if (set.sellrewRandom !== '1') {a2 = set.sellrewMale;}
-						else {a2 = mNames[randomInteger(0, (mNames.length - 1))];}
-					}
-					switch(set.sellrewAddToName) {
-						case 'none': break;
-						case '0': a2 = a2 + ' ' + horseGP; break;
-						case '1': a2 = a2 + ' ' + horseGP.slice(-5); break;
-						case '2': a2 = a2 + ' ' + $('#competencesValeur', html).text(); break;
-						case '3': a2 = a2 + coatRarity; break;
-						case '4': a2 = a2 + ' ' + horseGP + ' ' + coatRarity; break;
-						case '5': a2 = a2 + ' ' + horseGP.slice(-5) + ' ' + coatRarity; break;
-						case '6': a2 = a2 + ' ' + $('#competencesValeur', html).text() + ' ' + coatRarity; break;
-					}
-					if (set.sellrewAffixe !== '') {
-						if (set.sellrewAffixe == 'Без аффикса') {
-							a3 = '';
+					listCounter++;
+					if (m == '2.1') {
+						if (localStorage.getItem('listToSaleRewrite').split(',')[listCounter] !== undefined) {
+							formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
 						}
 						else {
-							for (i = 0; i < affixesList.length; i++) {
-								if (set.sellrewAffixe.replace(/ /gim, '').toLowerCase() == affixesList[i].split('SELLREW')[0]) {a3 = affixesList[i].split('SELLREW')[1]; break;}
-							}
+							alert('Все отмеченные лошади успешно переименованы!');
+							$('#sellrewPower').click();
 						}
 					}
-					else {a3 = 'none';}
-					if (set.sellrewFarm !== '') {
-						if (set.sellrewFarm == 'Без завода') {
-							a4 = '';
+					else if (m == '2.3') {
+						if (localStorage.getItem('listToSaleRewrite').split(',')[listCounter] !== undefined) {
+							formSellData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
 						}
 						else {
-							for (i = 0; i < farmsList.length; i++) {
-								if (set.sellrewFarm.replace(/ /gim, '').toLowerCase() == farmsList[i].split('SELLREW')[0]) {a4 = farmsList[i].split('SELLREW')[1]; break;}
-							}
+							alert('Все отмеченные лошади успешно переименованы и проданы!');
+							$('#sellrewPower').click();
 						}
 					}
-					else {
-						a4 = $('div.elevage.align-center a', html).attr('href').split('=')[1];
-						if (a4 == 'all-horses') {a4 = '';}
-					}
-
-					if (a3 == 'none') {rewriteData = 'id=' + a1 + '&name=' + a2 + '&elevage=' + a4;}
-					else {rewriteData = 'id=' + a1 + '&name=' + a2 + '&affixe=' + a3 + '&elevage=' + a4;}
-					coatRarity = 0;
-					if (rewriteData.indexOf('undefined') !== -1) {
-						alert('Внимание! Неправильно указан аффикс или завод.\n' + rewriteData);
-						$('#sellrewPower').click();
-					}
-					else {
-						post = $.ajax({
-							type: "POST",
-							url: window.location.origin + '/elevage/chevaux/doUpdateProfil',
-							data: rewriteData
-						})
-						.then(function(result) {
-							if (m == '2.1') {
-								listCounter++;
-								if (localStorage.getItem('listToSaleRewrite').split(',')[listCounter] !== undefined) {
-									formRewriteData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
-								}
-								else {
-									alert('Все отмеченные лошади успешно переименованы!');
-									$('#sellrewPower').click();
-								}
-							}
-							else if (m == '2.3') {
-								formSellData(localStorage.getItem('listToSaleRewrite').split(',')[listCounter].toString(), m);
-							}
-						});
-					}	
 				}
 			}
 		});
@@ -667,7 +693,7 @@ function formSellData(horse, m) {
 }
 
 function main() {
-	var startWork
+	var startWork;
 	refreshStatus(); refreshAm();
 	if (mode == 1) {
 		switch(subMode) {
