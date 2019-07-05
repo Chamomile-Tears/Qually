@@ -1152,6 +1152,7 @@ try {
 	$('#clearListToSaleRewrite').click(function() {
 		localStorage.removeItem('listToSaleRewrite');
 		refreshAm();
+		location.reload();
 	});
 
 	$('#sellrewResetSettings').click(function() {
