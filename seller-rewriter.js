@@ -733,7 +733,7 @@ function main() {
 
 $(document).ready(function() {
 	try {
-		if (sellrewStartup == 1) {
+		if ((sellrewStartup == 1) && (location.href == localStorage.getItem('sellrewWorkPlace'))) {
 			main();
 		}
 	}
