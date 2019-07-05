@@ -1272,6 +1272,9 @@ try {
 	$('#sellrewPanelSettings input').click(function() {
 		if ($(this).attr('type') == 'checkbox') {
 			if ($(this).prop('checked') == true) {
+				if ($(this).attr('id') == 'sellrewTeam') {
+					$('#sellrewReserved').click();
+				}
 				localStorage.setItem($(this).attr('id'), 1);
 			}
 			else {
