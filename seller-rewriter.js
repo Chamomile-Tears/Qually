@@ -912,12 +912,12 @@ try {
 	var makeInputs = setInterval(function() {
 		if (location.href.indexOf('elevage/chevaux/?elevage=') !== -1) {
 			if (($('.chooseHorse').length == 0) || ($('.sellNumber').length == 0)) {
-				var cells = $('li[class^="nowrap"]');
+				var cells = $('li[class*="damier-horse"]');
 				for (var i = 0; i < cells.length; i++) {
-					$('li[class^="nowrap"]').eq(i).parent().append('<p class="sellNumber" style="float:left; margin:5px 0 0 0">№' + (i+1) + '</p>');
+					$('li[class*="damier-horse"]').eq(i).parent().append('<p class="sellNumber" style="float:left; margin:5px 0 0 0">№' + (i+1) + '</p>');
 					if (($('.header-logo').html().indexOf('vip') == -1) && ($('.header-logo').html().indexOf('pegase') == -1)) {
-						var chooseId = $('li[class^="nowrap"] .horsename:eq('+i+')').attr('href').replace(/\D+/g,"");
-						$('li[class^="nowrap"]').eq(i).parent().append('<span class="chooseHorse"><input id="'+chooseId+'" class="checkbox" name="chooseHorse[]" type="checkbox"></span>');
+						var chooseId = $('li[class*="damier-horse"] .horsename:eq('+i+')').attr('href').replace(/\D+/g,"");
+						$('li[class*="damier-horse"]').eq(i).parent().append('<span class="chooseHorse"><input id="'+chooseId+'" class="checkbox" name="chooseHorse[]" type="checkbox"></span>');
 					}
 				}
 			}
