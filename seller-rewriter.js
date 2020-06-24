@@ -235,7 +235,7 @@ function getFarms(m) {
 		.then(function(result) {
 			parse(result);
 			var farms = $('.tab-action-select', html);
-			for (i = 0; i < farms.length; i++) {
+			for (i = 0; i < farms.length-1; i++) {
 				farmsList[farmsList.length] = $('.tab-action-select', html).eq(i).text().replace(/ /gim, '').toLowerCase() + 'SELLREW' + $('.tab-action-select', html).eq(i).attr('href').split('tab-')[1];
 			}
 			localStorage.setItem('farmsList', farmsList);
