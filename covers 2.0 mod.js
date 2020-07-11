@@ -761,7 +761,7 @@ function main(num) {
                     $('#age button .button-inner-0').click();
                 }, 500);
             }
-            else {
+            else if (chevalSexe == 'masculin') {
                 $('#nav-next')[0].click();
 		        if (localStorage.getItem('startHorseCount') == 0) {localStorage.setItem('startHorseCount', 1);}
             }
