@@ -449,7 +449,6 @@ function femaleCovers() {
 						var offre = $('nav.content__breadcrumb.js-content__breadcrumb a[href*="jument"]', html).attr('href').split('offre=')[1].split('&')[0];
 						if ($('img[src*="licorne"]', html).length !== 0) {
 							if ($('#boutonDoReproduction', html).hasClass('disabled')) {
-								console.log('1');
 								localStorage.setItem('coversLicorne', 1);
 								localStorage.getItem('coversLicorne') == '1';
 								coverNotFound++;
@@ -756,18 +755,18 @@ function main(num) {
 		location.reload();
 	}
 	else {
-        console.log('End of all else-if');
         if ((set.coversLicorneModOn == '1') && (set.coversLicorneGrowOn == '1')) {
-            console.log('Checked settings');
-            if ( !((chevalSexe == 'feminin') && (chevalAge > 29) && ($('.action.action-style-4.saillir').length !== 0) && (!($('.action.action-style-4.saillir').hasClass('action-disabled')))) ) {
-                console.log('I click the age button!');
+            if ( (chevalSexe == 'feminin') && ( !(($('.action.action-style-4.saillir').length !== 0) && (!($('.action.action-style-4.saillir').hasClass('action-disabled')))) ) ) {
                 setInterval(() => {
                     $('#age button .button-inner-0').click();
                 }, 500);
             }
+            else {
+                $('#nav-next')[0].click();
+		        if (localStorage.getItem('startHorseCount') == 0) {localStorage.setItem('startHorseCount', 1);}
+            }
         }
         else {
-            console.log('Settings are false!');
             $('#nav-next')[0].click();
 		    if (localStorage.getItem('startHorseCount') == 0) {localStorage.setItem('startHorseCount', 1);}
         }
