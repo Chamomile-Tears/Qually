@@ -700,7 +700,7 @@ function sleep() {
 
 function main(num) {
 	checkLicorneCovers();
-	if (Number($('#reserve').text().replace(/[ ]/gim, '')) < 1200) {
+	if ((Number($('#reserve').text().replace(/[ ]/gim, '')) < 1200) && (set.coversSellSomething !== 'off')) {
 		checkMoney();
 	}
 	else if (($('div[widget^="7"] #cheval-inscription').length !== 0) && (set.coversEcDuration !== '0') && (centreNotFound < 1)) {
@@ -836,7 +836,7 @@ try {
 	$('#defaultOptions2').append('<span>Завод для жеребят:</span>');
 	$('#defaultOptions2').append('<input id="coversFarm" style="margin:5px 0 5px 0; width:' + ($('#defaultOptions').width() - 5) + 'px" type="text">');
 	$('#defaultOptions2').append('<span>Продавать:</span>');
-	$('#defaultOptions2').append('<select id="coversSellSomething" class="tip" data-tippy-content="Продать, если закончились экю" style="margin-top:5px; background-color:#fff; width:' + ($('#defaultOptions').width() - 3) + 'px"><option value="0">Овёс</option><option value="1">Фураж</option><option value="2">Яблоко</option><option value="3">Морковь</option><option value="4">Древесина</option><option value="5">Железо</option><option value="6">Песок</option><option value="7">Кожа</option><option value="8">Солома</option><option value="9">Лён</option><option value="10">Пшеница</option><option value="11">Экскременты</option></select>');
+	$('#defaultOptions2').append('<select id="coversSellSomething" class="tip" data-tippy-content="Продать, если закончились экю" style="margin-top:5px; background-color:#fff; width:' + ($('#defaultOptions').width() - 3) + 'px"><option value="off">Выкл.</option><option value="0">Овёс</option><option value="1">Фураж</option><option value="2">Яблоко</option><option value="3">Морковь</option><option value="4">Древесина</option><option value="5">Железо</option><option value="6">Песок</option><option value="7">Кожа</option><option value="8">Солома</option><option value="9">Лён</option><option value="10">Пшеница</option><option value="11">Экскременты</option></select>');
 	/*------------------------------------------Запись в КСК------------------------------------------*/
 	$('#coversPanelSettings').append('<div id="columnOne" style="float:left;"></div>');
 	$('#columnOne').append('<div id="centreOptions" style="width:185px; margin:10px 5px 0 5px; padding:5px 5px 8px 8px; border:1px solid white; border-radius: 5px; font-size:14px; color:#fff"></div>');
