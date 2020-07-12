@@ -812,7 +812,7 @@ try {
 	$('#coversPanelSettings').append('<div style="font-size:14px; margin-top:10px; margin-left:auto; margin-right:auto; text-align:center; widtn:150px; height:15px; font-weight:bold; color:#fff">Настройки</div>');
 	$('#coversPanelSettings').append('<div class="hoverImage" id="closeSettings" style="position:absolute; top:5px; left:619px; cursor:pointer"><img width="15" src="https://cdn4.iconfinder.com/data/icons/web-ui-color/128/Close-128.png"></div>');
 	/*-----------------------------------------Основные настройки-------------------------------------------*/
-    $('#coversPanelSettings').append('<div id="defaultOptions" style="height:256px; float:left; width:185px; margin:10px 5px 0 10px; padding:5px 5px 8px 8px; border:1px solid white; border-radius: 5px; font-size:14px; color:#fff"></div>');
+    $('#coversPanelSettings').append('<div id="defaultOptions" style="height:262px; float:left; width:185px; margin:10px 5px 0 10px; padding:5px 5px 8px 8px; border:1px solid white; border-radius: 5px; font-size:14px; color:#fff"></div>');
     $('#defaultOptions').append('<div id="coversLicorneMod" style="margin-bottom:8px; font-size:14px; color:#fff"></div>');
     $('#coversLicorneMod').append('<span>Вкл. мод:</span>');
     $('#coversLicorneMod').append('<span style="margin-left:5px; margin-right: 5px;"><input id="coversLicorneModOn" type="checkbox" style="position:relative; top:3px;"></span>');
