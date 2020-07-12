@@ -795,7 +795,7 @@ $(document).ready(function() {
 /***************************************ИНТЕРФЕЙС***************************************/
 try {
 	/*Главное окошко*/$('html[dir*="r"]').append('<div class="leftSidedPanel" id="coversPanel" style="background-color:rgba(60, 60, 60, 0.95); position:fixed; top:20px; left:0px; width:110px; height:90px; display:block; z-index:1000; border-radius:0px 10px 10px 0px; font-family:sans-serif"></div>');
-	/*Окно настроек*/$('html[dir*="r"]').append('<div class="leftSidedPanel toggleable" id="coversPanelSettings" style="background-color:rgba(60, 60, 60, 0.95); position:fixed; top:20px; left:'+ ($('#coversPanel').width() + 10) +'px; width:640px; height:345px; display:none; z-index:1000; border-radius:10px; font-family:sans-serif"></div>');
+	/*Окно настроек*/$('html[dir*="r"]').append('<div class="leftSidedPanel toggleable" id="coversPanelSettings" style="background-color:rgba(60, 60, 60, 0.95); position:fixed; top:20px; left:'+ ($('#coversPanel').width() + 10) +'px; width:640px; height:350px; display:none; z-index:1000; border-radius:10px; font-family:sans-serif"></div>');
 	//Оформление главного окошка
 	$('#coversPanel').append('<div class="tip" data-tippy-content="Посетить нашу группу" style="font-size:14px; margin-top:10px; margin-left:auto; margin-right:auto; text-align:center; widtn:150px; height:15px; font-weight:bold"><a target="_blank" href="https://vk.com/botqually" style="color:#ffffff">● Bot Qually ●</a></div>');
 	$('#coversPanel').append('<div style="font-size:9px; margin-top:3px; margin-left:auto; margin-right:auto; text-align:center; font-weight:bold; color:#ffffff">version: covers 2.0 mod</div>');
