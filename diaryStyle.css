@@ -1,0 +1,37 @@
+    * {
+        font-family: 'Raleway', sans-serif;
+        font-feature-settings: "lnum";
+    }
+
+    div[id*="cnt"] {
+        display: none !important;
+    }
+
+    #post0 .paragraph {
+        height: 15px;
+    }
+
+    .postDate, .countSecond .postDate {
+        font-size: 125%;
+    }
+
+    .postContent * {
+        font-size: 1.02em;
+        line-height: 1.5em;
+    }
+
+    #thisDiaryPhoto img {
+        border-radius: 50%;
+    }
+
+    .postContent {
+        padding: 15px;
+    }
+
+    .postContent img:not(.smile_img) {
+        margin-top: 15px;
+    }
+
+    img[alt=":alles:"] {
+        margin-top: -10px;
+    }
